@@ -1,7 +1,9 @@
 import { routerType } from "../types/router.types";
-import About from "./About/About";
-import ColorSystem from "./ColorSystem/ColorSystem";
-import Home from "./Home/Home";
+// import About from "./temp/About/About";
+import ColorSystem from "./temp/ColorSystem/ColorSystem";
+import Home from "./temp/Home/Home";
+import Signin from "./signin/Signin.tsx";
+import About from "./temp/About/About.tsx";
 
 const pagesData: routerType[] = [
     {
@@ -18,6 +20,11 @@ const pagesData: routerType[] = [
         path: "About",
         element: <About />,
         title: "about"
+    },
+    {
+        path: "signin",
+        element: <Signin/>,
+        title: "signin"
     }
 ];
 

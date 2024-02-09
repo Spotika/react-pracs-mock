@@ -40,7 +40,7 @@ const refreshTokens = async () => {
 
 }
 
-type User = {
+export type User = {
     _id: number,
     email: string,
     domain: string | null,

@@ -1,5 +1,5 @@
-import { FC, useContext, useState } from "react";
-import { AppBar, Avatar, Grid, IconButton,/* Menu, MenuItem,*/ Toolbar, Tooltip, Typography, useScrollTrigger, useTheme } from "@mui/material";
+import {FC, useContext, useEffect, useState} from "react";
+import { AppBar, Avatar, Grid, IconButton,/* Menu, MenuItem,*/ Toolbar, Tooltip, Typography, useScrollTrigger, /*useTheme*/ } from "@mui/material";
 import { ThemeModeContext, ThemeSchemeContext } from "../../Theme";
 import { useLocation } from "react-router-dom";
 
@@ -8,6 +8,7 @@ import ColorIcon from '@mui/icons-material/Shuffle';
 import DarkIcon from '@mui/icons-material/DarkModeOutlined';
 import LightIcon from '@mui/icons-material/LightModeOutlined';
 import RestartIcon from '@mui/icons-material/RefreshOutlined';
+import {getCurrentUser, User} from "../../api/auth.tsx";
 // import DownloadIcon from '@mui/icons-material/FileDownload';
 
 interface HeaderProps {
@@ -18,19 +19,19 @@ interface HeaderProps {
 const MainAppBar: FC<HeaderProps> = ({ onDrawerToggle, window }) => {
 
     const { toggleTheme, themeMode, setThemeMode } = useContext(ThemeModeContext);
-    const { generateScheme, themeScheme } = useContext(ThemeSchemeContext);
+    const { generateScheme, /*themeScheme*/ } = useContext(ThemeSchemeContext);
 
-    const muiTheme = useTheme();
+    // const muiTheme = useTheme();
     const location = useLocation();
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
+    // const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    // const open = Boolean(anchorEl);
 
-    const openMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const closeMenu = () => {
-        setAnchorEl(null);
-    };
+    // const openMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
+    // const closeMenu = () => {
+    //     setAnchorEl(null);
+    // };
 
     const trigger = useScrollTrigger({
         disableHysteresis: true,
@@ -82,7 +83,14 @@ const MainAppBar: FC<HeaderProps> = ({ onDrawerToggle, window }) => {
     //     element.click();
     // };
 
-    // const current_user =
+    const [user, setUser] = useState<User | undefined>(undefined);
+
+    useEffect(() => {
+        async function temp() {
+            setUser(await getCurrentUser());
+        }
+        temp();
+    }, []);
 
     return (
         <>
@@ -148,10 +156,10 @@ const MainAppBar: FC<HeaderProps> = ({ onDrawerToggle, window }) => {
                             </Tooltip>
                         </Grid>
                         <Grid item>
-                            <Tooltip title="">
+                            <Tooltip title={user?.domain}>
                                 <IconButton color="inherit" sx={{ p: 0.5 }}>
                                     <Avatar alt="My Avatar" sx={{ width: 28, height: 28, fontSize: 14, bgcolor: 'primary.main', color: 'onPrimary.main' }}>
-                                        Zk
+                                        {user?.last_name[0]}{user?.first_name[0]}
                                     </Avatar>
                                 </IconButton>
                             </Tooltip>

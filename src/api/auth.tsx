@@ -100,3 +100,23 @@ export const getCurrentUser = async (): Promise<User | undefined> => {
     console.log(first_user);
     return first_user;
 }
+
+export const getWithToken = async (path: string, query: any) => {
+    const current_user = await getCurrentUser();
+
+    if (current_user === undefined) {
+        window.location.href = "/auth/signin";
+        return;
+    }
+
+    try {
+        return await axios.get(path, {
+            params: {
+                ...query
+            }
+        });
+    } catch {
+        return undefined;
+    }
+    return undefined;
+}

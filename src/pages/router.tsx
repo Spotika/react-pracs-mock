@@ -5,6 +5,7 @@ import MainLayout from "./Layout/MainLayout";
 import Signin from "./signin/Signin.tsx";
 import AuthLayout from "./Layout/AuthLayout.tsx";
 
+
 const Router = () => {
     const pageRoutes = pagesData.map(({ path, title, element }: routerType) => {
         return <Route key={title} path={`/${path}`} element={element} />;

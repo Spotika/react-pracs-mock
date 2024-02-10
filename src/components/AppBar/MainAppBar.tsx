@@ -1,7 +1,7 @@
 import {FC, useContext, useEffect, useState} from "react";
 import { AppBar, Avatar, Grid, IconButton,/* Menu, MenuItem,*/ Toolbar, Tooltip, Typography, useScrollTrigger, /*useTheme*/ } from "@mui/material";
 import { ThemeModeContext, ThemeSchemeContext } from "../../Theme";
-import { useLocation } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 
 import MenuIcon from '@mui/icons-material/MenuTwoTone';
 import ColorIcon from '@mui/icons-material/Shuffle';
@@ -92,6 +92,8 @@ const MainAppBar: FC<HeaderProps> = ({ onDrawerToggle, window }) => {
         temp();
     }, []);
 
+    const navigate = useNavigate();
+
     return (
         <>
             <AppBar position="sticky" elevation={trigger ? 2 : 0} >
@@ -157,9 +159,11 @@ const MainAppBar: FC<HeaderProps> = ({ onDrawerToggle, window }) => {
                         </Grid>
                         <Grid item>
                             <Tooltip title={user?.domain}>
-                                <IconButton color="inherit" sx={{ p: 0.5 }}>
+                                <IconButton color="inherit" sx={{ p: 0.5 }} onClick={() => {
+                                    navigate("PersonalArea");
+                                }}>
                                     <Avatar alt="My Avatar" sx={{ width: 28, height: 28, fontSize: 14, bgcolor: 'primary.main', color: 'onPrimary.main' }}>
-                                        {user?.last_name[0]}{user?.first_name[0]}
+                                        {user?.first_name[0]}{user?.last_name[0]}
                                     </Avatar>
                                 </IconButton>
                             </Tooltip>

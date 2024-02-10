@@ -39,7 +39,6 @@ const MainLayout: FC = () => {
     };
 
     return (
-
         <Box sx={rootStyles}>
             <Box component="nav" sx={navStyles}>
                 {isSmUp ? null : (

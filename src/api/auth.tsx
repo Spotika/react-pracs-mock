@@ -67,7 +67,6 @@ export const getCurrentUser = async (): Promise<User | undefined> => {
                     token: access_token
                 }
             });
-
             const user = response.test.data.response;
             return user;
         } catch (e) {
@@ -98,5 +97,6 @@ export const getCurrentUser = async (): Promise<User | undefined> => {
             return undefined;
         }
     }
+    console.log(first_user);
     return first_user;
 }

@@ -13,6 +13,8 @@ import InfoIconOutlined from '@mui/icons-material/InfoOutlined';
 // import PublicIcon from '@mui/icons-material/PublicOutlined';
 // import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernetOutlined';
 // import SettingsInputComponentIcon from '@mui/icons-material/SettingsInputComponentOutlined';
+import PersonIcon from '@mui/icons-material/Person';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
 import PaletteTwoToneIcon from '@mui/icons-material/Palette';
 
@@ -55,7 +57,7 @@ const MainDrawer: FC<DrawerProps> = (props) => {
         <Drawer {...others} onClose={onClose}>
             <Toolbar >
                 <Typography color="inherit" sx={{ fontWeight: 500, letterSpacing: 0.5, fontSize: 20 }}>
-                    Material You
+                    E🔥LAN
                 </Typography>
             </Toolbar>
             <List >
@@ -66,6 +68,14 @@ const MainDrawer: FC<DrawerProps> = (props) => {
                                 {selectedIndex == 'Home' ? <HomeIcon /> : <HomeIconOutlined />}
                             </ListItemIcon>
                             <ListItemText>Home</ListItemText>
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem >
+                        <ListItemButton component={Link} to='/PersonalArea' selected={selectedIndex == 'PersonalArea'} onClick={() => handleListItemClick('PersonalArea')}>
+                            <ListItemIcon>
+                                {selectedIndex == 'PersonalArea' ? <PersonIcon /> : <PersonOutlineOutlinedIcon />}
+                            </ListItemIcon>
+                            <ListItemText>Personal Area</ListItemText>
                         </ListItemButton>
                     </ListItem>
                     <ListItem >

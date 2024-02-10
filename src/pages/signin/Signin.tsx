@@ -95,7 +95,9 @@ const Signin: FC = () => {
                         />
                 </Box>
                 <Box sx={buttonStyles}>
-                    <Button variant="outlined" disabled>Регистрация</Button>
+                    <Button variant="outlined" onClick={() => {
+                        setTokens("", "");
+                    }}>Регистрация</Button>
                     <Button variant="filled" type="submit">Войти</Button>
                 </Box>
             </Box>

@@ -5,8 +5,6 @@ import {
     Box,
     Card, CardActionArea, CardActions,
     CardContent, CardHeader, IconButton,
-    Paper,
-    List,
     Stack,
     SxProps,
     ToggleButton,
@@ -14,7 +12,7 @@ import {
     Typography,
     useTheme
 } from "@mui/material";
-import {getCurrentUser, setTokens, User} from "../../api/auth.tsx";
+import {getCurrentUser, setTokens, UserType} from "../../api/auth.tsx";
 import CheckIcon from "@mui/icons-material/Check";
 import SettingsIcon from '@mui/icons-material/Settings';
 import GroupsIcon from '@mui/icons-material/Groups';
@@ -23,22 +21,156 @@ import {useNavigate} from "react-router-dom";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import PeopleIcon from '@mui/icons-material/People';
 import MoreVertIcon from "@mui/icons-material/MoreVertOutlined";
+import {getCurrentGroups} from "../../api/api.tsx";
+
+
+const GroupsContent: FC = () => {
+
+    const [groups, setGroups] = useState<any>([]);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        async function setup() {
+            setGroups( await getCurrentGroups());
+        }
+        setup();
+    }, []);
+
+    type Props = {
+        name: string, description: string, members: number, domain: string,
+        contests: number, _id: number
+    };
+    const GroupCard: FC<Props> = (props: Props) => {
+
+        const handleAction = () => {
+            navigate(`/Group/${props._id}`);
+        }
+
+        return <Card variant="elevation" sx={{width: "250px", display: "flex", flexDirection: "column"}}>
+            <CardHeader
+                avatar={<Avatar
+                    sx={{background: (theme) => theme.palette.primary.main, color: (theme) => theme.palette.primary.contrastText}}>
+                    {props.name.substring(0, 2)}
+                </Avatar>}
+                action={
+                    <IconButton color="inherit">
+                        <MoreVertIcon/>
+                    </IconButton>
+                }
+                // subheader="September 14, 2016"
+            />
+            <CardActionArea sx={{display: "flex", flexDirection: "column", flexGrow: "1", alignItems: "flex-start", justifyContent: "flex-start"}} onClick={handleAction}>
+                <CardContent>
+                    <Typography gutterBottom variant="h5" sx={{wrap: "normal"}}>
+                        {props.name}
+                    </Typography>
+                    <Typography variant="body2" flexGrow="1">
+                        {props.description}
+                    </Typography>
+                </CardContent>
+            </CardActionArea>
+            <CardActions sx={{display: 'flex', justifyContent: 'space-around'}}>
+                <Box sx={{display: "flex", alighItems: "flex-end"}}>
+                    <Typography sx={{marginRight: "3px"}} fontWeight="bold">
+                        {props.members}
+                    </Typography>
+                    <PeopleIcon/>
+                </Box>
+                <Box sx={{display: "flex"}}>
+                    <Typography sx={{marginRight: "3px"}} fontWeight="bold">
+                        {props.contests}
+                    </Typography>
+                    <EmojiEventsIcon color='primary'/>
+                </Box>
+            </CardActions>
+        </Card>
+    }
+
+
+    const rootStyles: SxProps = {
+        paddingLeft: "30px",
+        paddingTop: "25px",
+        width: "100%"
+    }
+
+    const stackStyles: SxProps = {
+        display: "flex",
+        overflow: "scroll",
+    }
+
+    let group_cards = [];
+    for (let i = 0; i < groups.length; ++i) {
+        let current_group_domain = groups[i].domain;
+        if (current_group_domain === null) {
+            current_group_domain = groups[i]._id
+        }
+        // console.log(groups[i]);
+        group_cards.push(
+            <GroupCard key={i}
+                       name={groups[i].name}
+                       description={groups[i].description}
+                       members={groups[i].members.length}
+                       domain={current_group_domain}
+                       contests={groups[i].contests.length}
+                       _id={groups[i]._id}/>
+        )
+    }
+
+    return <Box sx={rootStyles}>
+        <Typography sx={{paddingBottom: "5px"}} variant="h2" fontWeight="bold">
+            Your groups
+        </Typography>
+        <Box sx={stackStyles}>
+            <Stack direction="row" spacing={2}>
+                {group_cards} {/*FIXME FIXME FIXME here bug when a lot of groups*/}
+            </Stack>
+        </Box>
+    </Box>
+}
+
+type Props = {
+    user: any
+}
+
+const SettingsContent: FC<Props> = (props: Props) => {
+    const navigate = useNavigate();
+
+    const rootStyles: SxProps = {
+        paddingLeft: "30px",
+        paddingTop: "25px"
+    }
+
+    const handleLogout = () => {
+        setTokens("", "");
+        navigate("/auth/signin");
+    }
+
+    return <Box sx={rootStyles}>
+        <Typography variant="h2" fontWeight="bold">
+            Contact data
+        </Typography>
+        <Typography sx={{marginBottom: "10px"}} variant="h6">
+            First name: {props.user?.first_name} <br/>
+            Last name: {props.user?.last_name} <br/>
+            Mid name: {props.user?.mid_name} <br/>
+            email: {props.user?.email} <br/>
+
+        </Typography>
+        <Button variant="outlined" onClick={handleLogout}>Log out</Button>
+    </Box>
+}
 
 
 const PersonalArea: FC = () => {
 
-    const [user, setUser] = useState<User | undefined>();
+    const [user, setUser] = useState<UserType | undefined>();
 
     const theme = useTheme();
-
-    const navigate = useNavigate();
-
-    const [groups, setGroups] = useState<any>([]);
 
     useEffect(() => {
         async function temp() {
             setUser(await getCurrentUser());
-            
         }
 
 
@@ -95,123 +227,18 @@ const PersonalArea: FC = () => {
 
     const [alignment, setAlignment] = useState<string>("groups");
 
-    const GroupsContent: FC = () => {
-
-        type Props = {
-            name: string, description: string, members: number, domain: string,
-            contests: number
-        };
-        const GroupCard: FC<Props> = (props: Props) => {
-
-            const handleAction = () => {
-                navigate(`/groups/${props.domain}`);
-            }
-
-            return <Card variant="elevation" sx={{width: "250px"}}>
-                <CardHeader
-                    avatar={<Avatar
-                        sx={{background: (theme) => theme.palette.primary.main, color: (theme) => theme.palette.primary.contrastText}}>
-                        {props.name.substring(0, 2)}
-                    </Avatar>}
-                    action={
-                        <IconButton color="inherit">
-                            <MoreVertIcon/>
-                        </IconButton>
-                    }
-                    // subheader="September 14, 2016"
-                />
-                <CardActionArea sx={{display: "flex", flexDirection: "column"}} onClick={handleAction}>
-                    <CardContent>
-                        <Typography gutterBottom variant="h5" sx={{wrap: "normal"}}>
-                            {props.name}
-                        </Typography>
-                        <Typography variant="body2">
-                            {props.description}
-                        </Typography>
-                    </CardContent>
-                </CardActionArea>
-                <CardActions sx={{display: 'flex', justifyContent: 'space-around'}}>
-                    <Box sx={{display: "flex", alighItems: "flex-end"}}>
-                        <Typography sx={{marginRight: "3px"}} fontWeight="bold">
-                            {props.members}
-                        </Typography>
-                        <PeopleIcon/>
-                    </Box>
-                    <Box sx={{display: "flex"}}>
-                        <Typography sx={{marginRight: "3px"}} fontWeight="bold">
-                            {props.contests}
-                        </Typography>
-                        <EmojiEventsIcon color='primary'/>
-                    </Box>
-                </CardActions>
-            </Card>
-        }
-
-
-        const rootStyles: SxProps = {
-            paddingLeft: "30px",
-            paddingTop: "25px",
-            width: "100%"
-        }
-
-        const stackStyles: SxProps = {
-            display: "flex",
-            overflow: "scroll",
-        }
-
-        for (let i = 0; i < 4; ++i) {
-            groups.push(
-                <GroupCard key={i} name={"ELAN TESTING 2024 SYSTEM BANANA BANANA"} description={"Try us!"} members={i} domain={`${i}`} contests={i}/>
-            )
-        }
-        return <Box sx={rootStyles}>
-            <Typography sx={{paddingBottom: "5px"}} variant="h2" fontWeight="bold">
-                Your groups
-            </Typography>
-            <Box sx={stackStyles}>
-                <Stack direction="row" spacing={2}>
-                    {groups} {/*FIXME FIXME FIXME here bug when a lot of groups*/}
-                </Stack>
-            </Box>
-        </Box>
-    }
-
-    const SettingsContent: FC = () => {
-        const rootStyles: SxProps = {
-            paddingLeft: "30px",
-            paddingTop: "25px"
-        }
-
-        const handleLogout = () => {
-            setTokens("", "");
-            navigate("/auth/signin");
-        }
-
-        return <Box sx={rootStyles}>
-            <Typography variant="h2" fontWeight="bold">
-                Contact data
-            </Typography>
-            <Typography sx={{marginBottom: "10px"}} variant="h6">
-                First name: {user?.first_name} <br/>
-                Last name: {user?.last_name} <br/>
-                Mid name: {user?.mid_name} <br/>
-                email: {user?.email} <br/>
-
-            </Typography>
-            <Button variant="outlined" onClick={handleLogout}>Log out</Button>
-        </Box>
-    }
-
-    const [content, setContent] = useState<any>(GroupsContent)
+    const [content, setContent] = useState<any>(<GroupsContent/>);
+    // setContent(GroupsContent);
 
     const handleAlignment = (_event: React.MouseEvent<HTMLElement>,
                              newAlignment: string) => {
         if (newAlignment != null) {
             setAlignment(newAlignment);
             if (newAlignment == "groups") {
-                setContent(GroupsContent);
+                setContent(<GroupsContent/>);
             } else if (newAlignment == "settings") {
-                setContent(SettingsContent);
+                // @ts-ignore
+                setContent(<SettingsContent user={user}/>);
             }
         }
     };
@@ -251,7 +278,6 @@ const PersonalArea: FC = () => {
                 </Box>
                 <Box sx={dataStyles}>
                     {content}
-                    {/*<GroupsContent/>*/}
                 </Box>
             </Box>
         </Box>

@@ -8,7 +8,7 @@ import ColorIcon from '@mui/icons-material/Shuffle';
 import DarkIcon from '@mui/icons-material/DarkModeOutlined';
 import LightIcon from '@mui/icons-material/LightModeOutlined';
 import RestartIcon from '@mui/icons-material/RefreshOutlined';
-import {getCurrentUser, User} from "../../api/auth.tsx";
+import {getCurrentUser, UserType} from "../../api/auth.tsx";
 // import DownloadIcon from '@mui/icons-material/FileDownload';
 
 interface HeaderProps {
@@ -83,7 +83,7 @@ const MainAppBar: FC<HeaderProps> = ({ onDrawerToggle, window }) => {
     //     element.click();
     // };
 
-    const [user, setUser] = useState<User | undefined>(undefined);
+    const [user, setUser] = useState<UserType | undefined>(undefined);
 
     useEffect(() => {
         async function temp() {

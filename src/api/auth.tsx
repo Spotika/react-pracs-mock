@@ -40,7 +40,7 @@ const refreshTokens = async () => {
 
 }
 
-export type User = {
+export type UserType = {
     _id: number,
     email: string,
     domain: string | null,
@@ -51,13 +51,13 @@ export type User = {
     roles: string[]
 }
 
-export const getCurrentUser = async (): Promise<User | undefined> => {
+export const getCurrentUser = async (): Promise<UserType | undefined> => {
     let tokens = getTokens();
     if (tokens.access_token === null || tokens.refresh_token === null) {
         return undefined;
     }
 
-    const tryGetUser = async (access_token: string): Promise<User | undefined | "expired"> => {
+    const tryGetUser = async (access_token: string): Promise<UserType | undefined | "expired"> => {
         var response: {test: any} = {
             test: undefined
         }
@@ -67,8 +67,7 @@ export const getCurrentUser = async (): Promise<User | undefined> => {
                     token: access_token
                 }
             });
-            const user = response.test.data.response;
-            return user;
+            return response.test.data.response;
         } catch (e) {
             if (response.test != undefined) {
                 if (response.test.status === "TOKEN_EXPIRED") {
@@ -97,7 +96,6 @@ export const getCurrentUser = async (): Promise<User | undefined> => {
             return undefined;
         }
     }
-    console.log(first_user);
     return first_user;
 }
 
@@ -109,14 +107,16 @@ export const getWithToken = async (path: string, query: any) => {
         return;
     }
 
+    const tokens = getTokens();
+
     try {
         return await axios.get(path, {
             params: {
-                ...query
+                ...query,
+                token: tokens.access_token
             }
         });
     } catch {
         return undefined;
     }
-    return undefined;
 }

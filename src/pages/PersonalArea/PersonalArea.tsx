@@ -105,7 +105,7 @@ const GroupsContent: FC = () => {
         if (current_group_domain === null) {
             current_group_domain = groups[i]._id
         }
-        // console.log(groups[i]);
+
         group_cards.push(
             <GroupCard key={i}
                        name={groups[i].name}

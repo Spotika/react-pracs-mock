@@ -1,21 +1,131 @@
 import {FC, useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {Avatar, Box, Stack, SxProps, ToggleButton, ToggleButtonGroup, Typography, useTheme} from "@mui/material";
+import {
+    Avatar,
+    Box,
+    Card, CardActionArea, CardActions, CardContent,
+    CardHeader, IconButton,
+    Stack,
+    SxProps,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
+    useTheme
+} from "@mui/material";
 import {getCurrentUser, UserType} from "../../api/auth.tsx";
-import {getGroupById, GroupType} from "../../api/api.tsx";
+import {getGroupById, getGroupContests, GroupType} from "../../api/api.tsx";
 import CheckIcon from "@mui/icons-material/Check";
 import GroupsIcon from "@mui/icons-material/Groups";
 import SettingsIcon from "@mui/icons-material/Settings";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import MoreVertIcon from "@mui/icons-material/MoreVertOutlined";
+import LightbulbIcon from '@mui/icons-material/Lightbulb';
+import MenuIcon from '@mui/icons-material/Menu';
+
+const ContestsContent: FC<{group_id: any}> = (props: {group_id: any}) => {
+
+    const [contests, setContests] = useState<any>([]);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        async function setup() {
+            setContests( await getGroupContests(props.group_id));
+        }
+        setup();
+    }, []);
+
+    type Props = {
+        name: string, description: string, domain: string,
+        _id: number, tasks_num: number
+    };
+    const ContestCard: FC<Props> = (props: Props) => {
+
+        const handleAction = () => {
+            navigate(`/Contests/${props._id}`);
+        }
+
+        return <Card variant="elevation" sx={{width: "250px", display: "flex", flexDirection: "column"}}>
+            <CardHeader
+                avatar={<Avatar
+                    sx={{background: (theme) => theme.palette.primary.main, color: (theme) => theme.palette.primary.contrastText}}>
+                    {props.name.substring(0, 2)}
+                </Avatar>}
+                action={
+                    <IconButton color="inherit">
+                        <MoreVertIcon/>
+                    </IconButton>
+                }
+                // subheader="September 14, 2016"
+            />
+            <CardActionArea sx={{display: "flex", flexDirection: "column", flexGrow: "1", alignItems: "flex-start", justifyContent: "flex-start"}} onClick={handleAction}>
+                <CardContent>
+                    <Typography gutterBottom variant="h5" sx={{wrap: "normal"}}>
+                        {props.name}
+                    </Typography>
+                    <Typography variant="body2" flexGrow="1">
+                        {props.description}
+                    </Typography>
+                </CardContent>
+            </CardActionArea>
+            <CardActions sx={{display: 'flex', justifyContent: 'space-around', paddingRight: "10%"}}>
+                <Box sx={{display: "flex", alighItems: "flex-end"}}>
+                    <Typography sx={{marginRight: "3px"}} fontWeight="bold">
+                        {0} {/*TODO: MAKE it work*/}
+                    </Typography>
+                    <LightbulbIcon/>
+                </Box>
+                <Box sx={{display: "flex", alighItems: "flex-end"}}>
+                    <Typography sx={{marginRight: "3px"}} fontWeight="bold">
+                        {props.tasks_num}
+                    </Typography>
+                    <MenuIcon/>
+                </Box>
+            </CardActions>
+        </Card>
+    }
 
 
-const ContestsContent: FC = () => {
+    const rootStyles: SxProps = {
+        paddingLeft: "30px",
+        paddingTop: "25px",
+        width: "100%"
+    }
 
-    return <>
-        contests
-    </>
+    const stackStyles: SxProps = {
+        display: "flex",
+        overflow: "scroll",
+    }
+
+    let contests_cards = [];
+
+    for (let i = 0; i < contests.length; ++i) {
+        let current_group_domain = contests[i].domain;
+        if (current_group_domain === null) {
+            current_group_domain = contests[i]._id
+        }
+
+        contests_cards.push(
+            <ContestCard key={i}
+                       name={contests[i].name}
+                       description={contests[i].description}
+                       domain={current_group_domain}
+                       tasks_num={contests[i].tasks.length}
+                       _id={contests[i]._id}/>
+        )
+    }
+
+    return <Box sx={rootStyles}>
+        <Typography sx={{paddingBottom: "5px"}} variant="h2" fontWeight="bold">
+            Groups contests
+        </Typography>
+        <Box sx={stackStyles}>
+            <Stack direction="row" spacing={2}>
+                {contests_cards} {/*FIXME FIXME FIXME here bug when a lot of groups*/}
+            </Stack>
+        </Box>
+    </Box>
 }
-
 
 const MembersContent: FC = () => {
 
@@ -111,14 +221,14 @@ const Group: FC = () => {
 
     const [alignment, setAlignment] = useState<string>("contests");
 
-    const [content, setContent] = useState<any>(<ContestsContent/>);
+    const [content, setContent] = useState<any>(<ContestsContent group_id={id}/>);
 
     const handleAlignment = (_event: React.MouseEvent<HTMLElement>,
                              newAlignment: string) => {
         if (newAlignment != null) {
             setAlignment(newAlignment);
             if (newAlignment == "contests") {
-                setContent(<ContestsContent/>);
+                setContent(<ContestsContent group_id={id}/>);
             } else if (newAlignment == "settings") {
                 setContent(<SettingsContent/>);
             } else if (newAlignment == "members") {

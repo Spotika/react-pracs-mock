@@ -64,3 +64,24 @@ export const getGroupById = async (_id: number): Promise<undefined | GroupType> 
 
     return response.data.response;
 }
+
+export const getGroupContests = async (group_id: number) => {
+
+    const current_user = await getCurrentUser();
+
+    if (current_user === undefined) {
+        window.location.href = "/auth/signin";
+        return;
+    }
+
+
+    const response = await getWithToken(Endpoints.GROUPS_GET_CONTESTS, {
+        "group_id": group_id
+    })
+
+    if (response === undefined) {
+        return undefined;
+    }
+    console.log(response.data.response.contests);
+    return response.data.response.contests
+}

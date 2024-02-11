@@ -85,3 +85,31 @@ export const getGroupContests = async (group_id: number) => {
     console.log(response.data.response.contests);
     return response.data.response.contests
 }
+
+export type ContestType = {
+    name: string,
+    description: string,
+    domain: string | null,
+    tasks: number[],
+    linked_group: number
+}
+
+export const getContestById = async (_id: number) => {
+
+    const current_user = await getCurrentUser();
+
+    if (current_user === undefined) {
+        window.location.href = "/auth/signin";
+        return;
+    }
+
+    const response = await getWithToken(Endpoints.CONTESTS_GET, {
+        "_id": _id
+    })
+
+    if (response === undefined) {
+        return undefined;
+    }
+
+    return response.data.response;
+}

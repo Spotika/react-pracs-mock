@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import M3 from './Theme/M3/M3';
 import axios from "axios"
-
+import { monaco } from 'react-monaco-editor';
 const container = document.getElementById('app') as Element;
 const root = createRoot(container);
 

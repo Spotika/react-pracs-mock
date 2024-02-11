@@ -5,7 +5,8 @@ import ColorSystem from "./temp/ColorSystem/ColorSystem";
 import Home from "./temp/Home/Home";
 import About from "./temp/About/About.tsx";
 import PersonalArea from "./PersonalArea/PersonalArea.tsx";
-import Group from "./Groups/Group.tsx"
+import Group from "./Group/Group.tsx"
+import Contest from "./Contest/Contest.tsx";
 
 const pagesData: routerType[] = [
     {
@@ -40,6 +41,13 @@ const pagesData: routerType[] = [
             <Group/>
         </ProtectedRoute>,
         title: "Group"
+    },
+    {
+        path: "Contest/:id",
+        element: <ProtectedRoute>
+            <Contest/>
+        </ProtectedRoute>,
+        title: "Contest"
     }
 ];
 

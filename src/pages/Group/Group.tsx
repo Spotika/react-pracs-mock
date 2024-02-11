@@ -42,7 +42,7 @@ const ContestsContent: FC<{group_id: any}> = (props: {group_id: any}) => {
     const ContestCard: FC<Props> = (props: Props) => {
 
         const handleAction = () => {
-            navigate(`/Contests/${props._id}`);
+            navigate(`/Contest/${props._id}`);
         }
 
         return <Card variant="elevation" sx={{width: "250px", display: "flex", flexDirection: "column"}}>
@@ -258,6 +258,11 @@ const Group: FC = () => {
                     </Typography>
                     <Typography variant="h5" sx={{color: `${theme.palette.outline.main}`}}>
                         {group?.domain === null ? group?._id : group?.domain}
+                    </Typography>
+                </Box>
+                <Box sx={nameStyles}>
+                    <Typography variant="body1">
+                        {group?.description}
                     </Typography>
                 </Box>
             </Box>

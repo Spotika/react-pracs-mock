@@ -120,3 +120,28 @@ export const getWithToken = async (path: string, query: any) => {
         return undefined;
     }
 }
+
+export const postWithToken = async (path: string, query: any) => {
+    const current_user = await getCurrentUser();
+
+    if (current_user === undefined) {
+        window.location.href = "/auth/signin";
+        return;
+    }
+
+    const tokens = getTokens();
+
+    try {
+        return await axios.post(path, {
+            ...query,
+            token: tokens.access_token
+        }, {
+            params: {
+                ...query,
+                token: tokens.access_token
+            }
+        });
+    } catch (e) {
+        return undefined;
+    }
+}

@@ -1,4 +1,5 @@
-import {getCurrentUser, getWithToken} from "./auth.tsx";
+import axios from "axios";
+import {getCurrentUser, getWithToken, postWithToken} from "./auth.tsx";
 import Endpoints from "./endpoints.tsx";
 
 export type GroupType = {
@@ -124,32 +125,35 @@ export const getContestProblemsResources = async(contest_id: number): Promise<an
     }
 
 
-    const tasks = (await getContestById(contest_id)).tasks;
+    const problems = (await getContestById(contest_id)).problems;
 
-    if (tasks === undefined) {
+    if (problems === undefined) {
         return undefined
     }
 
     let result = []
 
-    for (let i = 0; i < tasks.length; ++i) {
-        const task_id = tasks[i];
-        const legend_response = await getWithToken(Endpoints.TASKS_GET_LEGEND, {
+    for (let i = 0; i < problems.length; ++i) {
+        const task_id = problems[i];
+        const legend_response = await getWithToken(Endpoints.PROBLEMS_GET_LEGEND, {
             "_id": task_id
         })
-        const input_response = await getWithToken(Endpoints.TASKS_GET_INPUT, {
+        const input_response = await getWithToken(Endpoints.PROBLEMS_GET_INPUT, {
             "_id": task_id
         })
-        const output_response = await getWithToken(Endpoints.TASKS_GET_OUTPUT, {
+        const output_response = await getWithToken(Endpoints.PROBLEMS_GET_OUTPUT, {
             "_id": task_id
         })
-        const scoring_response = await getWithToken(Endpoints.TASKS_GET_SCORING, {
+        const scoring_response = await getWithToken(Endpoints.PROBLEMS_GET_SCORING, {
             "_id": task_id
         })
-        const notes_response = await getWithToken(Endpoints.TASKS_GET_NOTES, {
+        const notes_response = await getWithToken(Endpoints.PROBLEMS_GET_NOTES, {
             "_id": task_id
         })
-        const task_name_response = await getWithToken(Endpoints.TASKS_GET_NAME, {
+        const task_name_response = await getWithToken(Endpoints.PROBLEMS_GET_NAME, {
+            "_id": task_id
+        })
+        const examples_response = await getWithToken(Endpoints.PROBLEMS_GET_EXAMPLES, {
             "_id": task_id
         })
 
@@ -163,11 +167,34 @@ export const getContestProblemsResources = async(contest_id: number): Promise<an
             input: input_response?.data, 
             output: output_response?.data,
             scoring: scoring_response?.data,
-            notes: notes_response?.data
+            notes: notes_response?.data,
+            id: task_id,
+            examples_input: examples_response?.data.response.input,
+            examples_output: examples_response?.data.response.output,
         })
     }
 
-    console.log(result)
-
     return result;
+}
+
+export const sendSolution = async(contest_id: number, problem_id: number, solution: string): Promise<"OK" | undefined> => {
+
+    const current_user = await getCurrentUser();
+
+    if (current_user === undefined) {
+        window.location.href = "/auth/signin";
+        return;
+    }
+
+    const response = await postWithToken(Endpoints.SUBMISSIONS_CREATE, {
+        contest_id: contest_id,
+        problem_id: problem_id,
+        solution: solution
+    })
+
+
+    if (response === undefined) {
+        return undefined
+    }
+    return "OK"
 }

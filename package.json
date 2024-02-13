@@ -19,6 +19,7 @@
     "@types/axios": "^0.14.0",
     "@types/katex": "^0.16.7",
     "@types/react-latex": "^2.0.3",
+    "@types/react-transition-group": "^4.4.10",
     "katex": "^0.16.9",
     "prismjs": "^1.29.0",
     "react": "18.2.0",

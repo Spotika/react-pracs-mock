@@ -11,7 +11,7 @@ import {
     useTheme
 } from "@mui/material";
 import {getCurrentUser, getWithToken, UserType} from "../../api/auth.tsx";
-import {ContestType, getContestById, getContestProblemsResources} from "../../api/api.tsx";
+import {ContestType, getContestById, getContestProblemsResources, sendSolution} from "../../api/api.tsx";
 import CheckIcon from "@mui/icons-material/Check";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -19,12 +19,12 @@ import { Editor } from "@monaco-editor/react";
 import { ThemeModeContext } from "../../Theme/index.ts";
 import { useContext } from "react";
 import Latex from "react-latex-next";
-import katex from 'katex'
+
 
 const ResultContent: FC = () => {
-    return <>
-        result
-    </>
+    return <div>
+
+    </div>
 }
 
 
@@ -34,12 +34,57 @@ type TaskResources = {
     input: string, 
     output: string,
     scoring: string,
-    notes: string
+    notes: string,
+    id: number,
+    examples_input: string[],
+    examples_output: string[]
 }
 
 type TasksProps = {
     contest_id: any
 }
+
+
+const Examples: FC<any> = (props: any) => {
+
+    const input: string[] = props.input;
+    const output: string[] = props.output;
+    const theme = useTheme();
+
+    let result: any = [];
+
+    input?.forEach((element, index) => {
+        result.push(<Box sx={{
+            marginBottom: "10px",
+            // paddingLeft: "10px"
+            borderRadius: "30px",
+            backgroundColor: `${theme.palette.surfaceContainerHighest.main}`,
+            padding: "20px",
+            whiteSpace: "pre-line"
+        }}>
+            <Typography variant="h5" fontWeight="bold">
+                Входные данные
+            </Typography>
+            <Typography variant="h6" sx={{
+                marginBottom: "15px",
+                whiteSpace: "pre-line"
+            }}>
+                {element}
+            </Typography>
+            <Typography variant="h5" fontWeight="bold">
+                Выходные данные
+            </Typography>
+            <Typography variant="h6">
+                {output[index]}
+            </Typography>
+        </Box>)   
+    });
+    return <div>
+        {result}
+
+    </div>
+}
+
 
 const TasksContent: FC<TasksProps> = (props: TasksProps) => {
 
@@ -54,16 +99,17 @@ const TasksContent: FC<TasksProps> = (props: TasksProps) => {
 
     const [navButtons, setNavButtons] = useState<any>([]);
 
-    const [code, setCode] = useState("")
+    const [code, setCode] = useState<string[]>(["// your code here!"])
 
     let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
     const [editorState, setEditorState] = useState<"show" | "hide">("show")
 
+    const [examples, setExamples] = useState<string[]>([]);
+
     useEffect(() => {
         async function setup() {
             const contestProblemsResources = await getContestProblemsResources(props.contest_id)
-            
 
             setStatesNum(contestProblemsResources.length)
             let toChange = []
@@ -74,6 +120,17 @@ const TasksContent: FC<TasksProps> = (props: TasksProps) => {
             }
             setNavButtons(toChange);
             setTasksResources(contestProblemsResources);
+
+            let current_code = code;
+            while (current_code.length > contestProblemsResources.length) {
+                current_code.pop();
+            }
+
+            while (current_code.length < contestProblemsResources.length) {
+                current_code.push("// your code here!");
+            }
+
+            setCode(current_code);
         }
 
         setup();
@@ -110,9 +167,14 @@ const TasksContent: FC<TasksProps> = (props: TasksProps) => {
     }
 
 
+    const handleSubmit = async () => {
+        const response = await sendSolution(props.contest_id, tasksResources[currentState].id, code[currentState]);
 
-    const handleSubmit = () => {
-        console.log(currentState);
+        if (response === undefined) {
+            alert("Error occured")
+        } else  {
+            // console.log(props.contest_id, tasksResources[currentState].id);
+        }
     }
 
     // katex.render("c = \\pm\\sqrt{a^2 + b^2}", element, {
@@ -165,6 +227,14 @@ const TasksContent: FC<TasksProps> = (props: TasksProps) => {
                             {tasksResources[currentState]?.output || ""}
                         </Latex>
                     </Typography>
+                    <Typography variant="h4" fontWeight="bold" sx={{
+                        marginBottom: "10px"
+                    }}>
+                        Примеры
+                    </Typography>
+                    <Typography variant="h5" fontWeight="bold">
+                        <Examples input={tasksResources[currentState]?.examples_input} output={tasksResources[currentState]?.examples_output}></Examples>
+                    </Typography>
                     <Typography variant="h4" fontWeight="bold">
                         Примечание
                     </Typography>
@@ -196,8 +266,12 @@ const TasksContent: FC<TasksProps> = (props: TasksProps) => {
                         height="100%"
                         width="100%"
                         language="cpp"
-                        value={code}
-                        onChange={(code: any) => setCode(code)}
+                        value={code[currentState]}
+                        onChange={(code_new: any) => {
+                            let current_code = code;
+                            current_code[currentState] = code_new;
+                            setCode(current_code);
+                        }}
                         />
 
                 </Box>
@@ -206,8 +280,7 @@ const TasksContent: FC<TasksProps> = (props: TasksProps) => {
                 }}>
                     <Button variant="filled" onClick={handleSubmit} sx={{
                     display: `${editorState == "show" ? "inline" : "none"}`
-
-                    }}>Submit</Button>
+                    }}>Send solution!</Button>
                 </Typography>
             </Box>
         </Box>
@@ -283,8 +356,7 @@ const Contest: FC = () => {
         backgroundColor: `${theme.palette.surfaceContainerLowest.main}`,
         borderRadius: "30px",
         height: "100vh",
-        // overflow: "scroll",
-        paddingBottom: "100px"
+        paddingBottom: "200px"
     }
 
     const [alignment, setAlignment] = useState<string>("tasks");

@@ -107,11 +107,11 @@ const ContestsContent: FC<{group_id: any}> = (props: {group_id: any}) => {
 
         contests_cards.push(
             <ContestCard key={i}
-                       name={contests[i].name}
-                       description={contests[i].description}
+                       name={contests[i]?.name}
+                       description={contests[i]?.description}
                        domain={current_group_domain}
-                       tasks_num={contests[i].tasks.length}
-                       _id={contests[i]._id}/>
+                       tasks_num={contests[i]?.problems?.length}
+                       _id={contests[i]?._id}/>
         )
     }
 

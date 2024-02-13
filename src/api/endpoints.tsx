@@ -8,12 +8,14 @@ const Endpoints = {
     GROUPS_GET: "/groups/get",
     GROUPS_GET_CONTESTS: "/groups/get_contests",
     CONTESTS_GET: "/contests/get",
-    TASKS_GET_LEGEND: "/tasks/get_legend",
-    TASKS_GET_SCORING: "/tasks/get_scoring",
-    TASKS_GET_INPUT: "/tasks/get_input",
-    TASKS_GET_OUTPUT: "/tasks/get_output",
-    TASKS_GET_NOTES: "/tasks/get_notes",
-    TASKS_GET_NAME: "/tasks/get_name"
+    PROBLEMS_GET_LEGEND: "/problems/get_legend",
+    PROBLEMS_GET_SCORING: "/problems/get_scoring",
+    PROBLEMS_GET_INPUT: "/problems/get_input",
+    PROBLEMS_GET_OUTPUT: "/problems/get_output",
+    PROBLEMS_GET_NOTES: "/problems/get_notes",
+    PROBLEMS_GET_NAME: "/problems/get_name",
+    PROBLEMS_GET_EXAMPLES: "/problems/get_examples",
+    SUBMISSIONS_CREATE: "/submissions/create"    
 }
 
 

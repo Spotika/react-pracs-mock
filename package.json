@@ -2,7 +2,7 @@
   "name": "react-material-you-theme",
   "version": "1.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
@@ -17,12 +17,19 @@
     "@mui/styled-engine-sc": "^5.12.0",
     "@srsholmes/react-code-input": "^0.0.5",
     "@types/axios": "^0.14.0",
+    "@types/katex": "^0.16.7",
+    "@types/react-latex": "^2.0.3",
+    "katex": "^0.16.9",
     "prismjs": "^1.29.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-katex": "^3.0.1",
+    "react-latex": "^2.0.0",
+    "react-latex-next": "^2.2.0",
     "react-monaco-editor": "^0.55.0",
     "react-router-dom": "^6.11.1",
     "react-simple-code-editor": "^0.13.1",
+    "react-tex": "^1.5.0",
     "styled-components": "^5.3.10"
   },
   "devDependencies": {

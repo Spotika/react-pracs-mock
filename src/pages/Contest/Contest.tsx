@@ -10,39 +10,76 @@ import {
     Typography,
     useTheme
 } from "@mui/material";
-import {getCurrentUser, UserType} from "../../api/auth.tsx";
-import {ContestType, getContestById} from "../../api/api.tsx";
+import {getCurrentUser, getWithToken, UserType} from "../../api/auth.tsx";
+import {ContestType, getContestById, getContestProblemsResources} from "../../api/api.tsx";
 import CheckIcon from "@mui/icons-material/Check";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Editor } from "@monaco-editor/react";
 import { ThemeModeContext } from "../../Theme/index.ts";
 import { useContext } from "react";
+import Latex from "react-latex-next";
+import katex from 'katex'
 
 const ResultContent: FC = () => {
-
     return <>
         result
     </>
 }
 
 
-const TasksContent: FC = () => {
+type TaskResources = {
+    name: string,
+    legend: string,
+    input: string, 
+    output: string,
+    scoring: string,
+    notes: string
+}
 
-    const [tasks, setTasks] = useState<number[]>([]);
-    const [taskText, setTaskText] = useState(
-        "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae dicta, distinctio dolores eos iure libero omnis, perferendis perspiciatis placeat quas ut veniam! Animi assumenda beatae consequatur debitis deleniti deserunt dolores enim et, harum illum ipsam ipsum libero pariatur quas quasi quis quo, quod repellendus totam vitae. Aliquam amet animi beatae commodi cupiditate debitis dolorem eius, eos eveniet exercitationem impedit incidunt, ipsa iure maiores modi neque nesciunt nobis nostrum officia quisquam rem repudiandae rerum soluta, velit veritatis. Atque dignissimos dolore ducimus earum, excepturi illo laboriosam laborum laudantium libero minus necessitatibus odit quae quasi repellat sunt temporibus voluptatibus! Dignissimos dolore dolores, esse id laborum magnam omnis quia veritatis voluptas. Ab alias animi architecto asperiores at delectus eligendi esse et ex expedita illo incidunt iste itaque iure magnam maiores nisi nostrum optio possimus quaerat qui reiciendis temporibus ullam veritatis, voluptatem. Accusamus aliquid ipsa libero maiores quam suscipit tenetur vel! A dolorem, quia? Accusamus animi aperiam consequuntur deleniti dignissimos hic illum incidunt, laboriosam laborum laudantium minima molestiae, nesciunt pariatur quidem reprehenderit sapiente voluptas! Ab beatae blanditiis commodi deleniti, eum eveniet fugit hic illum numquam odio officiis optio quam quasi quibusdam repellendus temporibus vitae voluptatibus. Accusantium at enim excepturi harum hic perferendis provident reiciendis rem sapiente similique? Assumenda aut corporis, cupiditate dicta doloremque dolores eaque esse est excepturi, ipsam, laboriosam maxime minima nam necessitatibus nihil obcaecati odio praesentium quibusdam quis recusandae repellendus similique soluta? Aliquid aperiam blanditiis dolorem eligendi esse eum eveniet expedita fugit harum inventore ipsam ipsum labore laborum, laudantium magnam maiores molestiae nam necessitatibus nostrum, odio omnis quasi quis quo repellat sapiente similique suscipit tempora, voluptas voluptatibus voluptatum? Deserunt eius excepturi fuga impedit iste labore laboriosam laudantium, maiores minima modi nesciunt numquam placeat praesentium quibusdam reiciendis rem, veniam vitae. Ad consectetur culpa magnam unde. Architecto aspernatur cupiditate dicta doloremque, est eveniet explicabo harum, id ipsam itaque libero necessitatibus pariatur possimus quo recusandae ullam unde ut veritatis. Animi architecto aut cum debitis delectus deserunt dolor dolore dolores ducimus eligendi enim est, ex hic in incidunt ipsam, iste libero magnam minus molestiae nam necessitatibus numquam officia pariatur perspiciatis quae quibusdam quidem quis recusandae repellat repellendus repudiandae suscipit tempora tempore tenetur velit vero. Alias aliquid amet aspernatur consequuntur, culpa dicta ducimus enim excepturi exercitationem facere in incidunt inventore ipsum laboriosam laudantium magni, nam non nulla obcaecati officia optio quidem quod recusandae sequi, unde. Ab accusamus ad minima nostrum possimus. Aliquid architecto explicabo labore magni modi mollitia nulla obcaecati perferendis ullam voluptatum? Alias culpa cupiditate est iure pariatur, repellat voluptate. Ab beatae consectetur fugit numquam rem similique totam? Ab accusamus aliquam autem blanditiis cum deserunt dicta dignissimos, doloremque ea eius eligendi ex excepturi fugiat hic illo itaque magni molestias, necessitatibus nihil numquam obcaecati omnis perferendis provident ratione repellat tenetur ut veniam. Ab accusantium architecto autem beatae consequuntur cum debitis doloremque ea est expedita facilis fugiat harum inventore itaque magnam magni maiores, molestiae molestias nam numquam officiis perspiciatis quidem recusandae reprehenderit sapiente, suscipit veniam voluptas! Alias commodi facere illo iusto libero, modi nemo nulla officia placeat quasi repellendus tempore voluptates voluptatum? Beatae delectus ducimus itaque iusto molestiae recusandae sapiente soluta voluptatem. Adipisci enim, nihil. A architecto asperiores aspernatur assumenda, autem beatae dolores eos et, ex explicabo illo magnam officia, omnis quas quisquam repellendus repudiandae ullam vitae! A adipisci aut deleniti deserunt dignissimos dolor doloribus eum facere hic illo illum ipsam ipsum iure laudantium maiores minima minus non odio officia perferendis quasi qui quisquam recusandae, reprehenderit sint! A adipisci architecto asperiores beatae blanditiis consequuntur corporis, culpa cum delectus doloribus ex expedita explicabo fuga impedit ipsa laboriosam laudantium libero minus nam natus nobis obcaecati odio officiis optio pariatur perferendis praesentium quam quod quos recusandae repellendus tenetur unde vero? Animi exercitationem iusto minus nulla obcaecati officia perferendis velit! Inventore laudantium nostrum officiis placeat praesentium. Accusamus amet aspernatur consequuntur cum, dicta distinctio doloribus enim excepturi id impedit in pariatur quas quisquam quo quod repellat repudiandae sed sint! Aut doloremque earum ipsam laudantium modi provident sapiente voluptates? Corporis et odio pariatur perferendis porro sint? Cum maiores suscipit voluptates. Aut autem dicta, est harum illum, ipsa ipsam ipsum magni nemo odio porro, quam quia quidem soluta vitae. Adipisci aliquam amet animi aspernatur atque beatae consectetur delectus dignissimos dolore doloremque doloribus explicabo fugiat fugit in incidunt inventore iste, minima molestiae mollitia nemo neque nobis non nostrum obcaecati officiis optio perspiciatis porro quibusdam repellendus tempore temporibus ullam ut vel voluptas voluptatem voluptates voluptatibus? Ad aliquam aliquid aperiam cum cumque, cupiditate dicta distinctio dolorem doloremque ducimus est eum excepturi fuga in incidunt laboriosam magnam maxime minus omnis perspiciatis quam quasi quia quibusdam quisquam reiciendis rem repellat reprehenderit rerum sed tempora ullam unde veritatis voluptatibus. Accusamus aspernatur at atque commodi corporis cum dicta dignissimos dolor dolore doloremque doloribus eius eligendi eos eum, fugiat inventore ipsum iste itaque iure libero modi necessitatibus neque nostrum quaerat quas quasi quibusdam repudiandae, sed sequi similique sint tempora temporibus tenetur totam vitae voluptas voluptatibus. Ad aliquam aperiam dolorum magni minus nobis officiis perferendis suscipit! Adipisci aliquid animi consequuntur explicabo illum magni neque quidem, quo rerum voluptatum. Aliquam aperiam architecto aspernatur assumenda beatae blanditiis consequatur cupiditate delectus dolor dolorem eaque explicabo, illo in laboriosam laudantium modi, molestias nemo nesciunt nihil nostrum pariatur quam qui quia quos repellat saepe sequi tempora tempore veritatis voluptatum. Aperiam corporis dolorum, eaque enim nam saepe. Adipisci aliquid aut autem beatae consequuntur culpa cumque deleniti deserunt dolore expedita facilis illo labore minima nemo, nobis nulla officia perferendis, perspiciatis quam ratione sint temporibus totam ut? Aspernatur at autem beatae dolorem eligendi excepturi, fuga labore nesciunt, odit placeat sequi vero voluptates! Amet assumenda cupiditate deleniti eaque, earum impedit magnam natus nesciunt numquam optio reiciendis sapiente, totam voluptas. Accusantium alias animi delectus doloremque, eius eligendi in iure molestias nostrum repellat totam voluptatem? Aperiam numquam quae quaerat voluptatum. Commodi dolor dolorum error in magnam nesciunt omnis quaerat voluptatibus. Ad adipisci assumenda, blanditiis consequuntur culpa esse eum eveniet ex exercitationem incidunt laudantium minus modi mollitia pariatur placeat quae quam quas qui quidem quis quo rem sed similique totam ullam, voluptas voluptate? Dolorem et officia temporibus!"
-    )
+type TasksProps = {
+    contest_id: any
+}
+
+const TasksContent: FC<TasksProps> = (props: TasksProps) => {
+
+    const [tasksResources, setTasksResources] = useState<TaskResources[]>([]);
+    const [taskText, setTaskText] = useState("test")
     const theme = useTheme();
     const { toggleTheme, themeMode, setThemeMode } = useContext(ThemeModeContext);
 
     const [currentState, setCurrentState] = useState(0);
 
+    const [statesNum, setStatesNum] = useState(0);
+
+    const [navButtons, setNavButtons] = useState<any>([]);
+
     const [code, setCode] = useState("")
 
+    let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    const [editorState, setEditorState] = useState<"show" | "hide">("show")
+
     useEffect(() => {
-        setTasks([1, 2, 3, 4, 5, 6, 7, 8]);
-    }, []);
+        async function setup() {
+            const contestProblemsResources = await getContestProblemsResources(props.contest_id)
+            
+
+            setStatesNum(contestProblemsResources.length)
+            let toChange = []
+            for (let i = 0; i < contestProblemsResources.length; ++i) {
+                toChange.push(
+                    <Button key={i} value={i} variant={currentState == i ? "filled" : "outlined"} color="secondary" onClick={handleChangeState}>{alphabet[i]}</Button>
+                )
+            }
+            setNavButtons(toChange);
+            setTasksResources(contestProblemsResources);
+        }
+
+        setup();
+
+    }, [currentState]);
+
 
     const rootStyles: SxProps = {
         padding: "40px",
@@ -53,7 +90,8 @@ const TasksContent: FC = () => {
     const navStyles: SxProps = {
         display: "flex",
         marginBottom: "30px",
-        overflow: "scroll"
+        overflow: "scroll",
+        justifyContent: "space-between"
     }
 
     const taskStyles: SxProps = {
@@ -62,25 +100,31 @@ const TasksContent: FC = () => {
         overflow: "scroll",
         padding: "20px",
         height: "100%",
-        paddingBottom: "150px"
+        paddingBottom: "150px",
+        display: "flex"
     }
 
-    let states_num = 10;
-    let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
     const handleChangeState = (e: any) => {
         setCurrentState(e.target.value)
     }
 
-    const navButtons = [];
-    for (let i = 0; i < states_num; ++i) {
-        navButtons.push(
-            <Button key={i} value={i} variant={currentState == i ? "filled" : "outlined"} color="secondary" onClick={handleChangeState}>{alphabet[i]}</Button>
-        )
-    }
+
 
     const handleSubmit = () => {
         console.log(currentState);
+    }
+
+    // katex.render("c = \\pm\\sqrt{a^2 + b^2}", element, {
+    //     throwOnError: false
+    // });
+
+    const handleEditorState = () => {
+        if (editorState == "show") {
+            setEditorState("hide")
+        } else {
+            setEditorState("show")
+        }
     }
 
     return <Box sx={rootStyles}>
@@ -88,43 +132,87 @@ const TasksContent: FC = () => {
             <Stack spacing={2} direction="row">
                 {navButtons}
             </Stack>
+            <Stack spacing={2} direction="row">
+                <Button variant={editorState == "show" ? "filled" : "outlined"} color="secondary" onClick={handleEditorState}>Editor</Button>
+            </Stack>
         </Box>
         <Box sx={taskStyles}>
-            <Box sx={{
-                marginBottom: "20px"
-            }}>
-                <Typography variant="h3" fontWeight="bold" mb="20px">
-                    {alphabet[currentState]}. Задача говна
-                </Typography>
-                <Typography variant="h5">
-                    {tasks[currentState]}
-                </Typography>
+            <Box>
+                <Box sx={{
+                    marginBottom: "20px"
+                }}>
+                    <Typography variant="h3" fontWeight="bold" mb="20px">
+                        {alphabet[currentState]}. {tasksResources[currentState]?.name}
+                    </Typography>
+                    <Typography variant="h5" mb="20px">
+                        <Latex>
+                            {tasksResources[currentState]?.legend|| ""}
+                        </Latex>
+                    </Typography>
+                    <Typography variant="h4" fontWeight="bold">
+                        Формат входных данных
+                    </Typography>
+                    <Typography variant="h5" mb="20px">
+                        <Latex>
+                            {tasksResources[currentState]?.input || ""}
+                        </Latex>
+                    </Typography>
+                    <Typography variant="h4" fontWeight="bold">
+                        Формат выходных данных
+                    </Typography>
+                    <Typography variant="h5"  mb="20px">
+                        <Latex>
+                            {tasksResources[currentState]?.output || ""}
+                        </Latex>
+                    </Typography>
+                    <Typography variant="h4" fontWeight="bold">
+                        Примечание
+                    </Typography>
+                    <Typography variant="h5" mb="20px">
+                        <Latex>
+                            {tasksResources[currentState]?.notes || ""}
+                        </Latex>
+                    </Typography>
+                </Box>
             </Box>
             <Box sx={{
-                borderRadius: "30px",
-                height: "500px",
-                overflow: "hidden",
-                width: "800px",
-                marginBottom: "20px",
+                display: "flex",
+                flexDirection: "column",
+                marginLeft: "30px"
             }}>
-                <Editor
-                    options={{
-                        fontSize: 20,
-                        formatOnType: true,
-                    }}
-                    theme={themeMode == "light" ? "" : "vs-dark" }
-                    height="100%"
-                    width="100%"
-                    language="cpp"
-                    value={code}
-                    onChange={(code: any) => setCode(code)}
-                    />
+                <Box sx={{
+                    borderRadius: "30px",
+                    height: "700px",
+                    overflow: "hidden",
+                    minWidth: "800px",
+                    display: `${editorState == "show" ? "block" : "none"}`
+                }}>
+                    <Editor
+                        options={{
+                            fontSize: 20,
+                            formatOnType: true,
+                        }}
+                        theme={themeMode == "light" ? "" : "vs-dark" }
+                        height="100%"
+                        width="100%"
+                        language="cpp"
+                        value={code}
+                        onChange={(code: any) => setCode(code)}
+                        />
+
+                </Box>
+                <Typography variant="h2" sx={{
+                    alignSelf: "flex-end"
+                }}>
+                    <Button variant="filled" onClick={handleSubmit} sx={{
+                    display: `${editorState == "show" ? "inline" : "none"}`
+
+                    }}>Submit</Button>
+                </Typography>
             </Box>
-            <Button variant="filled" onClick={handleSubmit}>Submit</Button>
         </Box>
     </Box>
 }
-
 
 const Contest: FC = () => {
 
@@ -160,7 +248,7 @@ const Contest: FC = () => {
 
     const userStyles: SxProps = {
         paddingTop: "80px",
-        display: "flex",
+        display: "none",
         flexDirection: "column",
         alignItems: "center",
         color: `${theme.palette.onSurface.main}`,
@@ -201,14 +289,14 @@ const Contest: FC = () => {
 
     const [alignment, setAlignment] = useState<string>("tasks");
 
-    const [content, setContent] = useState<any>(<TasksContent/>);
+    const [content, setContent] = useState<any>(<TasksContent contest_id={id}/>);
     //
     const handleAlignment = (_event: React.MouseEvent<HTMLElement>,
                              newAlignment: string) => {
         if (newAlignment != null) {
             setAlignment(newAlignment);
             if (newAlignment == "tasks") {
-                setContent(<TasksContent/>);
+                setContent(<TasksContent contest_id={id}/>);
             } else if (newAlignment == "result") {
                 setContent(<ResultContent/>);
             }
@@ -257,8 +345,8 @@ const Contest: FC = () => {
                     </Stack>
                 </Box>
                 <Box sx={dataStyles}>
-                    {/*{content}*/}
-                    <TasksContent/>
+                    {content}
+                    {/* <TasksContent/> */}
                 </Box>
             </Box>
         </Box>

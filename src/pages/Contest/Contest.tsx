@@ -11,20 +11,120 @@ import {
     useTheme
 } from "@mui/material";
 import {getCurrentUser, getWithToken, UserType} from "../../api/auth.tsx";
-import {ContestType, getContestById, getContestProblemsResources, sendSolution} from "../../api/api.tsx";
+import {ContestType, getContestById, getContestProblemsResources, getUserContestSubmissions, sendSolution} from "../../api/api.tsx";
 import CheckIcon from "@mui/icons-material/Check";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Editor } from "@monaco-editor/react";
 import { ThemeModeContext } from "../../Theme/index.ts";
 import { useContext } from "react";
+import { styled } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 import Latex from "react-latex-next";
 
 
-const ResultContent: FC = () => {
-    return <div>
+const ResultContent: FC<any> = (props: any) => {
+    const StyledTableCell = styled(TableCell)(({ theme }) => ({
+        [`&.${tableCellClasses.head}`]: {
+          backgroundColor: theme.palette.primaryContainer.main,
+          color: theme.palette.onPrimaryContainer.main,
+          fontSize: 24,
+          paddingLeft: 30,
+          paddingRight: 30
+        },
+        [`&.${tableCellClasses.body}`]: {
+          fontSize: 20,
+          padding: "30px"
+        },
+    }));
+    
+    const StyledTableRow = styled(TableRow)(({ theme }) => ({
+        '&:nth-of-type(odd)': {
+            backgroundColor: theme.palette.action.hover,
+        },
+        // hide last border
+        '&:last-child td, &:last-child th': {
+            border: 0,
+        },
+    }));
 
-    </div>
+
+    function createData(
+        problem_name: string,
+        problem_id: number,
+        status: string,
+        upload_time: string,
+      ) {
+        return { problem_name, problem_id, status, upload_time };
+      }
+      
+    // const rows = [
+
+    // ];
+    const [rows, setRows] = useState<any>([]);
+    
+    useEffect(() => {
+        async function setup() {
+            const submissionsData = await getUserContestSubmissions(props.contest_id);
+            const to_bananas: any[] = []
+
+            for (let i = 0; i < submissionsData.result.length; ++i) {
+                to_bananas.push(
+                    createData(
+                        submissionsData.problem_names[i], 
+                        submissionsData.result[i]._id,
+                        submissionsData.result[i].status === null ? "Testing" : submissionsData.result[i].status,
+                        submissionsData.result[i].upload_time)
+                )
+                console.log(submissionsData.result[i]);
+            }
+            to_bananas.reverse();
+            setRows(to_bananas);
+        }
+        setup();
+    }, [])
+
+
+    return <Box sx={{
+        width: "100%",
+        height: "100%",
+        borderRadius: "30px",
+        overflow: "scroll",
+    }}>
+        <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                <TableHead>
+                <TableRow>
+                    <StyledTableCell>Problem name</StyledTableCell>
+                    <StyledTableCell align="right">id</StyledTableCell>
+                    <StyledTableCell align="right">Status</StyledTableCell>
+                    <StyledTableCell align="right">Upload time</StyledTableCell>
+                    {/* <StyledTableCell align="right">Protein&nbsp;(g)</StyledTableCell> */}
+                </TableRow>
+                </TableHead>
+                <TableBody>
+                {rows.map((row: any) => (
+                    <StyledTableRow key={row.problem_id}>
+                    <StyledTableCell component="th" scope="row">
+                        {row.problem_name}
+                    </StyledTableCell>
+                    <StyledTableCell align="right" scope="row">
+                        {row.problem_id}
+                    </StyledTableCell>
+                    <StyledTableCell align="right">{row.status}</StyledTableCell>
+                    <StyledTableCell align="right">{row.upload_time}</StyledTableCell>
+                    </StyledTableRow>
+                ))}
+                </TableBody>
+            </Table>
+            </TableContainer>
+    </Box>
 }
 
 
@@ -56,12 +156,11 @@ const Examples: FC<any> = (props: any) => {
     input?.forEach((element, index) => {
         result.push(<Box sx={{
             marginBottom: "10px",
-            // paddingLeft: "10px"
             borderRadius: "30px",
             backgroundColor: `${theme.palette.surfaceContainerHighest.main}`,
             padding: "20px",
             whiteSpace: "pre-line"
-        }}>
+        }} key={index}>
             <Typography variant="h5" fontWeight="bold">
                 Входные данные
             </Typography>
@@ -81,7 +180,6 @@ const Examples: FC<any> = (props: any) => {
     });
     return <div>
         {result}
-
     </div>
 }
 
@@ -370,7 +468,7 @@ const Contest: FC = () => {
             if (newAlignment == "tasks") {
                 setContent(<TasksContent contest_id={id}/>);
             } else if (newAlignment == "result") {
-                setContent(<ResultContent/>);
+                setContent(<ResultContent contest_id={id}/>);
             }
         }
     };
@@ -418,6 +516,7 @@ const Contest: FC = () => {
                 </Box>
                 <Box sx={dataStyles}>
                     {content}
+                    {/* <ResultContent contest_id={id}/> */}
                     {/* <TasksContent/> */}
                 </Box>
             </Box>

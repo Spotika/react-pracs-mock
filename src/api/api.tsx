@@ -198,3 +198,20 @@ export const sendSolution = async(contest_id: number, problem_id: number, soluti
     }
     return "OK"
 }
+
+export const getUserContestSubmissions = async (contest_id: number) => {
+    const current_user = await getCurrentUser();
+
+    if (current_user === undefined) {
+        window.location.href = "/auth/signin";
+        return;
+    }
+
+
+    const response = await getWithToken(Endpoints.SUBMISSIONS_GET_USER_CONTEST_SUBMISSIONS, {
+        user_id: current_user._id,
+        contest_id: contest_id
+    })
+
+    return response?.data.response;
+}

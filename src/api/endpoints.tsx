@@ -15,7 +15,8 @@ const Endpoints = {
     PROBLEMS_GET_NOTES: "/problems/get_notes",
     PROBLEMS_GET_NAME: "/problems/get_name",
     PROBLEMS_GET_EXAMPLES: "/problems/get_examples",
-    SUBMISSIONS_CREATE: "/submissions/create"    
+    SUBMISSIONS_CREATE: "/submissions/create",
+    SUBMISSIONS_GET_USER_CONTEST_SUBMISSIONS: "/submissions/get_user_contest_submissions"
 }
 
 

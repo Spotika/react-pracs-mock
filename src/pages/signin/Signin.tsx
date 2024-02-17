@@ -36,7 +36,7 @@ const Signin: FC = () => {
 
             setTokens(response.data.response.access_token, response.data.response.refresh_token);
 
-            navigate("/Home");
+            navigate("/PersonalArea");
         } catch (e) {
             // TODO: добавить оповещения
             alert("Неправильный логин или пароль")
@@ -95,7 +95,7 @@ const Signin: FC = () => {
                         />
                 </Box>
                 <Box sx={buttonStyles}>
-                    <Button variant="outlined" onClick={() => {
+                    <Button disabled variant="outlined" onClick={() => {
                         setTokens("", "");
                     }}>Регистрация</Button>
                     <Button variant="filled" type="submit">Войти</Button>

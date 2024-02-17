@@ -30,23 +30,29 @@ import Latex from "react-latex-next";
 
 
 const ResultContent: FC<any> = (props: any) => {
+
+    const theme = useTheme();
+
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
         [`&.${tableCellClasses.head}`]: {
-          backgroundColor: theme.palette.primaryContainer.main,
-          color: theme.palette.onPrimaryContainer.main,
+          backgroundColor: theme.palette.secondary.main,
+          color: theme.palette.onSecondary.main,
           fontSize: 24,
           paddingLeft: 30,
-          paddingRight: 30
+          paddingRight: 30,
+          border: 0
         },
         [`&.${tableCellClasses.body}`]: {
           fontSize: 20,
-          padding: "30px"
+          padding: "30px",
+          borderBottom: `1px solid ${theme.palette.surfaceContainerHighest.main}`
         },
     }));
     
     const StyledTableRow = styled(TableRow)(({ theme }) => ({
         '&:nth-of-type(odd)': {
             backgroundColor: theme.palette.action.hover,
+            border: 0
         },
         // hide last border
         '&:last-child td, &:last-child th': {
@@ -82,14 +88,22 @@ const ResultContent: FC<any> = (props: any) => {
                         submissionsData.result[i].status === null ? "Testing" : submissionsData.result[i].status,
                         submissionsData.result[i].upload_time)
                 )
-                console.log(submissionsData.result[i]);
             }
             to_bananas.reverse();
             setRows(to_bananas);
+            setTimeout(setup, 1000);
         }
         setup();
     }, [])
 
+
+    const sColors: any = {
+        "OK": theme.palette.success.main,
+        "WA": theme.palette.error.main,
+        "TL": theme.palette.error.main,
+        "CE": theme.palette.error.main,
+        "ML": theme.palette.error.main
+    }
 
     return <Box sx={{
         width: "100%",
@@ -117,7 +131,7 @@ const ResultContent: FC<any> = (props: any) => {
                     <StyledTableCell align="right" scope="row">
                         {row.problem_id}
                     </StyledTableCell>
-                    <StyledTableCell align="right">{row.status}</StyledTableCell>
+                    <StyledTableCell sx={{color: sColors[row.status.substr(0,2)], fontWeight: "bold"}} align="right">{row.status}</StyledTableCell>
                     <StyledTableCell align="right">{row.upload_time}</StyledTableCell>
                     </StyledTableRow>
                 ))}
@@ -178,6 +192,7 @@ const Examples: FC<any> = (props: any) => {
             </Typography>
         </Box>)   
     });
+    result.reverse();
     return <div>
         {result}
     </div>

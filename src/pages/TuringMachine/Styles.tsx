@@ -22,22 +22,32 @@ const useSyles = (): stylesTypeFirst => {
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                // justifyContent: "flex-end"
-                // alignItems: "flex-end"
             },
             hud: {
-                // height: "100px",
-                // paddingTop: "15px",
                 width: "100%",
-                // height: "500px"
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "30px 0",
+                backgroundColor: palette.primaryContainer.main,
+                color: palette.onPrimaryContainer.main
             },
             slider: {
+                alignSelf: "right",
                 display: "block",
-                // height: "10px"
+                width: "200px",
+                marginLeft: "20px",
             },
             slider_block: {
                 display: "flex",
-                alignItems: "center"
+                alignItems: "center",
+                marginRight: "40px"
+            },
+            hud_left: {
+                marginLeft: "20px"
+            }, 
+            hud_right: {
+
             }
         },
 
@@ -68,6 +78,7 @@ const useSyles = (): stylesTypeFirst => {
         machine: {
             root: {
                 height: "600px",
+                width: "2860px",
                 // flexGrow: "1"
                 marginBottom: "400px"
 

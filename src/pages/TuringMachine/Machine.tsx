@@ -14,6 +14,7 @@ var isMoving = false;
 // var duration = 1;
 
 
+
 function div(val: number, by: number): number {
     return (val - val % by) / by;
 }
@@ -67,6 +68,7 @@ class Cell {
 
 
 const Main = (palette: Palette) => {
+
     return () => {
 
         // var duration = 0.2;
@@ -94,7 +96,7 @@ const Main = (palette: Palette) => {
         const generateCells = (shift: number = 0): Cell[] => {
             let result = [];
             for (let i = 0; i < density; ++i) {
-                let cell = new Cell(new Vector2(i * cellSize + shift, div(Height, 2) - div(cellSize, 2)), (i + div(shift, cellSize)).toString(), i + div(shift, cellSize), palette);
+                let cell = new Cell(new Vector2(i * cellSize + shift + 2, div(Height, 2) - div(cellSize, 2)), (i + div(shift, cellSize)).toString(), i + div(shift, cellSize), palette);
                 cell.attach(layer);
                 result.push(cell);
             }
@@ -156,7 +158,7 @@ const Main = (palette: Palette) => {
         cursor.add(new Konva.Rect({
             width: cellSize,
             height: cellSize,
-            stroke: palette.primary.main,
+            stroke: palette.secondary.main,
             strokeWidth: 10,
             cornerRadius: 5
         }));
@@ -164,7 +166,7 @@ const Main = (palette: Palette) => {
         cursor.add(new Konva.Line({
             points: [0, 0, 25, 50, 50, 0],
             closed: true,
-            fill: palette.secondary.main,
+            fill: palette.primary.main,
             x: 25,
             y: -70
         }));
@@ -172,7 +174,7 @@ const Main = (palette: Palette) => {
         cursor.add(new Konva.Line({
             points: [0, 0, 25, -50, 50, 0],
             closed: true,
-            fill: palette.secondary.main,
+            fill: palette.primary.main,
             x: 25,
             y: cellSize + 70
         }));
@@ -181,9 +183,6 @@ const Main = (palette: Palette) => {
             if (cursor.getPosition().x + cellSize >= -layer.getPosition().x + Width) {
                 turnRight();
             }
-            if (isMoving) return;
-            isMoving = true;
-
             let tween = new Konva.Tween({
                 node: cursor,
                 x: cursor.getPosition().x + cellSize,
@@ -193,7 +192,6 @@ const Main = (palette: Palette) => {
                 },
                 easing: Konva.Easings.EaseInOut
             });
-
             tween.play();
         }
 
@@ -201,9 +199,6 @@ const Main = (palette: Palette) => {
             if (cursor.getPosition().x - cellSize < -layer.getPosition().x) {
                 turnLeft();
             }
-            if (isMoving) return;
-            isMoving = true;
-
             let tween = new Konva.Tween({
                 node: cursor,
                 x: cursor.getPosition().x - cellSize,
@@ -224,7 +219,9 @@ const Main = (palette: Palette) => {
             // duration /= 2;
             if (e.code == "ArrowLeft") {
                 cursorLeft();
+                console.log("left");
             } else if (e.code == "ArrowRight") {
+                console.log("right");
                 cursorRight();
             } else {
                 return;
@@ -237,8 +234,7 @@ const Main = (palette: Palette) => {
 const Machine: FC = () => {
     const palette = useTheme().palette;
     const styles: any = useSyles().machine;
-
-    useEffect(Main(palette), []);
+    useEffect(Main(palette), [palette]);
 
     return <Box id="canvas" sx={styles.root}>
     </Box>

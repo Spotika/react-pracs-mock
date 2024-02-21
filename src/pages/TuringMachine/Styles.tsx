@@ -48,6 +48,9 @@ const useSyles = (): stylesTypeFirst => {
             }, 
             hud_right: {
 
+            },
+            play_control: {
+                
             }
         },
 

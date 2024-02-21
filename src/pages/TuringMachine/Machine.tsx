@@ -1,112 +1,235 @@
-import { FC, useEffect, useRef } from "react"
+import { FC, useEffect, useState } from "react"
 import useSyles from "./Styles"
-import { Box, useTheme } from "@mui/material";
+import { Box, Palette, useTheme } from "@mui/material";
 import Konva from "konva";
 import Vector2 from "./Vector2";
+import { config } from "./config";
 
-const cellSize = 50;
-var Width = 0;
+let cellSize = 0;
+var Width = 2860;
 var Height = 0;
 var stage = undefined;
+const density = 26;
+var isMoving = false;
+// var duration = 1;
 
 
+function div(val: number, by: number): number {
+    return (val - val % by) / by;
+}
 
 
-class Field {
-    layer: Konva.Layer;
-
+class Cell {
     position: Vector2;
 
-    constructor(layer: Konva.Layer, position: Vector2) {
-        this.layer = layer;
+    cell: Konva.Group;
+
+    value: string;
+
+    index: number
+
+    constructor(position: Vector2, value: string, index: number, palette: Palette) {
         this.position = position;
+        this.value = value;
+        this.index = index;
+        this.cell = new Konva.Group({
+            x: this.position.x,
+            y: this.position.y,
+            width: cellSize,
+            height: cellSize
+        });
+
+        this.cell.add(new Konva.Rect({
+            width: cellSize,
+            height: cellSize,
+            stroke: palette.onSurface.main,
+            strokeWidth: 2
+        }));
+
+        this.cell.add(new Konva.Text({
+            text: this.value,
+            fontFamily: "Roboto",
+            fill: palette.onSurface.main,
+            fontSize: 30,
+            width: cellSize,
+            height: cellSize,
+            align: "center",
+            verticalAlign: "middle",
+            fontStyle: "bold"
+        }))
+    }
+
+    attach(layer: Konva.Layer) {
+        layer.add(this.cell);
     }
 }
 
 
-const Main = (palette: any) => {
+
+const Main = (palette: Palette) => {
     return () => {
-        var container = document.getElementById("container");
-        Width = container?.clientWidth || 0;
-        Height = container?.clientHeight || 0;
+
+        // var duration = 0.2;
+        var canvas = document.getElementById("canvas");
+
+        // Width = canvas?.clientWidth || 0;
+        Height = canvas?.clientHeight || 0;
+        cellSize = div(Width, density);
+
 
         stage = new Konva.Stage({
-            container: "container",
+            container: "canvas",
             width: Width,
             height: Height
         });
 
-        var position = new Vector2(0, 0);
-        var layer = new Konva.Layer(position);
+        var offset = 0;
+        var layer = new Konva.Layer({x: offset, y: 0});
         stage.add(layer);
         
-        
-        
+        var left: Cell[] = [];
+        var middle: Cell[] = [];
+        var right: Cell[] = [];
 
-        
+        const generateCells = (shift: number = 0): Cell[] => {
+            let result = [];
+            for (let i = 0; i < density; ++i) {
+                let cell = new Cell(new Vector2(i * cellSize + shift, div(Height, 2) - div(cellSize, 2)), (i + div(shift, cellSize)).toString(), i + div(shift, cellSize), palette);
+                cell.attach(layer);
+                result.push(cell);
+            }
+            return result;
+        }
 
-        // var rect1 = new Konva.Rect({
-        //     x: 0,
-        //     y: 0,
-        //     width: Width,
-        //     height: Height,
-        //     fill: palette.primaryContainer.main,
-        //     name: 'rect',
-        // });
+        const destroyCells = (cells: Cell[]) => {
+            for (let i = 0; i < cells.length; ++i) {
+                cells[i].cell.destroy();
+            }
+        }
 
+        left = generateCells(-Width);
+        middle = generateCells();
+        right = generateCells(Width);
 
-        // var rect2 = new Konva.Rect({
-        //     x: 0,
-        //     y: 0,
-        //     width: Width,
-        //     height: Height,
-        //     fill: palette.secondaryContainer.dark,
-        //     name: 'rect',
-        // });
-        // first_layer.add(rect1);
-        // second_layer.add(rect2);
+        const turnLeft = () => {
+            offset -= Width;
+            let twin = new Konva.Tween({
+                node: layer,
+                duration: config.duration,
+                x: layer.getAbsolutePosition().x + Width,
+                onFinish: () => {
+                    destroyCells(right);
+                    right = middle;
+                    middle = left;
+                    left = generateCells(offset - Width);
+                    isMoving = false;
+                },
+                easing: Konva.Easings.EaseInOut,
+            });
+            twin.play();
+        }
 
-        
-        // rect1.on("click", () => {
-        //     let tween1 = new Konva.Tween({
-        //         node: first_layer,
-        //         duration: 0.5,
-        //         easing: Konva.Easings.EaseInOut,
+        const turnRight = () => {
+            offset += Width;
+            let twin = new Konva.Tween({
+                node: layer,
+                duration: config.duration,
+                x: layer.getAbsolutePosition().x - Width,
+                onFinish: () => {
+                    destroyCells(left);
+                    left = middle;
+                    middle = right;
+                    right = generateCells(offset + Width);
+                    isMoving = false;
+                },
+                easing: Konva.Easings.EaseInOut,
+            });
+            twin.play();
+        }
 
-        //         y: first_layer.getPosition().y - Height,
-        //     });
-        //     tween1.play();
+        // Cursor shape
+        var cursor = new Konva.Group({
+            x: 0,
+            y: div(Height, 2) - div(cellSize, 2)
+        });
 
-        //     let tween2 = new Konva.Tween({
-        //         node: second_layer,
-        //         duration: 0.5,
-        //         easing: Konva.Easings.EaseInOut,
+        cursor.add(new Konva.Rect({
+            width: cellSize,
+            height: cellSize,
+            stroke: palette.primary.main,
+            strokeWidth: 10,
+            cornerRadius: 5
+        }));
 
-        //         y: second_layer.getPosition().y - Height,
-        //     });
-        //     tween2.play();
-        // });
+        cursor.add(new Konva.Line({
+            points: [0, 0, 25, 50, 50, 0],
+            closed: true,
+            fill: palette.secondary.main,
+            x: 25,
+            y: -70
+        }));
 
-                
-        // rect2.on("click", () => {
-        //     let tween1 = new Konva.Tween({
-        //         node: first_layer,
-        //         duration: 0.5,
-        //         easing: Konva.Easings.EaseInOut,
+        cursor.add(new Konva.Line({
+            points: [0, 0, 25, -50, 50, 0],
+            closed: true,
+            fill: palette.secondary.main,
+            x: 25,
+            y: cellSize + 70
+        }));
 
-        //         y: first_layer.getPosition().y + Height,
-        //     });
-        //     tween1.play();
+        const cursorRight = () => {
+            if (cursor.getPosition().x + cellSize >= -layer.getPosition().x + Width) {
+                turnRight();
+            }
+            if (isMoving) return;
+            isMoving = true;
 
-        //     let tween2 = new Konva.Tween({
-        //         node: second_layer,
-        //         duration: 0.5,
-        //         easing: Konva.Easings.EaseInOut,
+            let tween = new Konva.Tween({
+                node: cursor,
+                x: cursor.getPosition().x + cellSize,
+                duration: config.duration,
+                onFinish: () => {
+                    isMoving = false;
+                },
+                easing: Konva.Easings.EaseInOut
+            });
 
-        //         y: second_layer.getPosition().y + Height,
-        //     });
-        //     tween2.play();
-        // });
+            tween.play();
+        }
+
+        const cursorLeft = () => {
+            if (cursor.getPosition().x - cellSize < -layer.getPosition().x) {
+                turnLeft();
+            }
+            if (isMoving) return;
+            isMoving = true;
+
+            let tween = new Konva.Tween({
+                node: cursor,
+                x: cursor.getPosition().x - cellSize,
+                duration: config.duration,
+                onFinish: () => {
+                    isMoving = false;
+                },
+                easing: Konva.Easings.EaseInOut
+            });
+
+            tween.play();
+        }
+
+        layer.add(cursor);
+
+        // Event listening
+        document.addEventListener("keydown", (e: KeyboardEvent) => {
+            // duration /= 2;
+            if (e.code == "ArrowLeft") {
+                cursorLeft();
+            } else if (e.code == "ArrowRight") {
+                cursorRight();
+            } else {
+                return;
+            }
+        });
     }
 }
 
@@ -117,9 +240,9 @@ const Machine: FC = () => {
 
     useEffect(Main(palette), []);
 
-    return <Box id="container" sx={styles.root}>
-
+    return <Box id="canvas" sx={styles.root}>
     </Box>
+
 }
 
 export default Machine

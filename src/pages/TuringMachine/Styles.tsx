@@ -1,6 +1,4 @@
 import {SxProps, useTheme} from "@mui/material"
-import { CSSProperties } from "@mui/styled-engine-sc";
-
 
 type StylesTypeSecond = {
     [Key: string]: SxProps
@@ -24,9 +22,23 @@ const useSyles = (): stylesTypeFirst => {
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "flex-end"
+                // justifyContent: "flex-end"
                 // alignItems: "flex-end"
             },
+            hud: {
+                // height: "100px",
+                // paddingTop: "15px",
+                width: "100%",
+                // height: "500px"
+            },
+            slider: {
+                display: "block",
+                // height: "10px"
+            },
+            slider_block: {
+                display: "flex",
+                alignItems: "center"
+            }
         },
 
         // drawer
@@ -55,7 +67,10 @@ const useSyles = (): stylesTypeFirst => {
         // machine
         machine: {
             root: {
-                flexGrow: "1"
+                height: "600px",
+                // flexGrow: "1"
+                marginBottom: "400px"
+
             }
         }
     }

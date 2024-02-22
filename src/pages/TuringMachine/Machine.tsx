@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect } from "react"
 import useSyles from "./Styles"
 import { Box, Palette, useTheme } from "@mui/material";
 import Konva from "konva";
@@ -6,11 +6,11 @@ import Vector2 from "./Vector2";
 import { config } from "./config";
 
 let cellSize = 0;
-var Width = 2860;
+var Width = 2500;
 var Height = 0;
 var stage = undefined;
-const density = 26;
-var isMoving = false;
+const density = 25;
+// var isMoving = false;
 // var duration = 1;
 
 
@@ -74,7 +74,7 @@ const Main = (palette: Palette) => {
         // var duration = 0.2;
         var canvas = document.getElementById("canvas");
 
-        // Width = canvas?.clientWidth || 0;
+        Width = canvas?.clientWidth || 0;
         Height = canvas?.clientHeight || 0;
         cellSize = div(Width, density);
 
@@ -96,7 +96,7 @@ const Main = (palette: Palette) => {
         const generateCells = (shift: number = 0): Cell[] => {
             let result = [];
             for (let i = 0; i < density; ++i) {
-                let cell = new Cell(new Vector2(i * cellSize + shift + 2, div(Height, 2) - div(cellSize, 2)), (i + div(shift, cellSize)).toString(), i + div(shift, cellSize), palette);
+                let cell = new Cell(new Vector2(i * cellSize + shift, div(Height, 2) - div(cellSize, 2)), ("AB").toString(), i + div(shift, cellSize), palette);
                 cell.attach(layer);
                 result.push(cell);
             }
@@ -124,7 +124,7 @@ const Main = (palette: Palette) => {
                     right = middle;
                     middle = left;
                     left = generateCells(offset - Width);
-                    isMoving = false;
+                    // isMoving = false;
                 },
                 easing: Konva.Easings.EaseInOut,
             });
@@ -142,7 +142,7 @@ const Main = (palette: Palette) => {
                     left = middle;
                     middle = right;
                     right = generateCells(offset + Width);
-                    isMoving = false;
+                    // isMoving = false;
                 },
                 easing: Konva.Easings.EaseInOut,
             });
@@ -159,7 +159,7 @@ const Main = (palette: Palette) => {
             width: cellSize,
             height: cellSize,
             stroke: palette.secondary.main,
-            strokeWidth: 10,
+            strokeWidth: 7,
             cornerRadius: 5
         }));
 
@@ -188,7 +188,7 @@ const Main = (palette: Palette) => {
                 x: cursor.getPosition().x + cellSize,
                 duration: config.duration,
                 onFinish: () => {
-                    isMoving = false;
+                    // isMoving = false;
                 },
                 easing: Konva.Easings.EaseInOut
             });
@@ -204,7 +204,7 @@ const Main = (palette: Palette) => {
                 x: cursor.getPosition().x - cellSize,
                 duration: config.duration,
                 onFinish: () => {
-                    isMoving = false;
+                    // isMoving = false;
                 },
                 easing: Konva.Easings.EaseInOut
             });

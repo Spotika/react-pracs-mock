@@ -1,5 +1,5 @@
 import { FC, useState } from "react"
-import { Box, Button, IconButton, Typography } from "@mui/material"
+import { Box, IconButton, Typography } from "@mui/material"
 import useStyles from "./Styles"
 import TDrawer from "./TDrawer"
 import Machine from "./Machine"
@@ -16,13 +16,17 @@ const TuringMachine: FC = () => {
 
     const styles: any = useStyles().main;
     const [duration, setDuration] = useState(config.duration);
+    const [action, setAction] = useState(false);
 
-
-    const handleChange = (event: Event, newValue: number | number[]) => {
+    const handleChange = (_event: Event, newValue: number | number[]) => {
         setDuration(newValue as number);
         config.duration = newValue as number;
         console.log(config.duration);
     };
+
+    const handleActionChange = () => {
+        setAction(!action);
+    }
 
     return <Box sx={styles.root}>
         <Box sx={{
@@ -41,20 +45,31 @@ const TuringMachine: FC = () => {
                 <Box sx={styles.hud_right}>
                     <Box sx={styles.slider_block}>
                         <SpeedIcon fontSize={"large"}/>
-                        <Slider sx={styles.slider} min={0} max={2} step={0.1} aria-label="Volume" value={duration} onChange={handleChange} valueLabelDisplay="auto"/>            
+                        <Slider
+                            sx={styles.slider}
+                            min={0}
+                            max={2}
+                            step={0.1}
+                            aria-label="Volume"
+                            value={duration}
+                            onChange={handleChange}
+                            valueLabelDisplay="auto"/>
                     </Box>
                     <Box sx={styles.play_control}>
-                        <IconButton size="large">
+                        <IconButton disabled={action} size="large" color={"primary"}>
                             <SkipPreviousRoundedIcon fontSize="large"/>
                         </IconButton>
-                        <IconButton>
-                            <PlayArrowRoundedIcon/>
-                        </IconButton>
-                        <IconButton>
-                            <PauseRoundedIcon/>
-                        </IconButton>
-                        <IconButton>
-                            <SkipNextRoundedIcon/>
+                        {action ?
+                            <IconButton onClick={handleActionChange} color={"primary"}>
+                                <PauseRoundedIcon fontSize="large"/>
+                            </IconButton>
+                            :
+                            <IconButton onClick={handleActionChange} color={"primary"}>
+                                <PlayArrowRoundedIcon fontSize="large"/>
+                            </IconButton>
+                        }
+                        <IconButton disabled={action} color={"primary"}>
+                            <SkipNextRoundedIcon fontSize="large"/>
                         </IconButton>
                     </Box>
                 </Box>

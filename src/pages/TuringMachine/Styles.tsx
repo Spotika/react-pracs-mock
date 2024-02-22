@@ -28,7 +28,7 @@ const useSyles = (): stylesTypeFirst => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                padding: "30px 0",
+                padding: "20px",
                 backgroundColor: palette.primaryContainer.main,
                 color: palette.onPrimaryContainer.main
             },
@@ -37,6 +37,7 @@ const useSyles = (): stylesTypeFirst => {
                 display: "block",
                 width: "200px",
                 marginLeft: "20px",
+
             },
             slider_block: {
                 display: "flex",
@@ -44,13 +45,13 @@ const useSyles = (): stylesTypeFirst => {
                 marginRight: "40px"
             },
             hud_left: {
-                marginLeft: "20px"
+                // marginLeft: "20px"
             }, 
             hud_right: {
-
+                display: "flex",
             },
             play_control: {
-                
+                color: palette.onPrimaryContainer.main
             }
         },
 
@@ -58,22 +59,28 @@ const useSyles = (): stylesTypeFirst => {
         drawer: {
             drawer: {
                 height: "80%",
-                backgroundColor: palette.surfaceContainerLow.main
+                backgroundColor: palette.surfaceContainerLow.main,
+                borderRadius: "30px 30px 0 0",
+                paddingTop: 40
             },
             drawer_opener: {
                 color: palette.onSurface.main,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                // paddingLeft: "30px",
-                // textAlign: "center",
-                // textJustify: "inter-character",
                 height: "80px",
-                // width: "100%",
                 fontWeight: "bold",
                 backgroundColor: palette.surfaceContainerLow.main,
                 fontSize: "24px"
             },
+            table: {
+                overflow: "hidden",
+                borderRadius: "30px"
+            },
+            options: {
+                paddingLeft: "20px",
+                marginBottom: "20px"
+            }
         },
 
 
@@ -81,7 +88,7 @@ const useSyles = (): stylesTypeFirst => {
         machine: {
             root: {
                 height: "600px",
-                width: "2860px",
+                width: "2500px",
                 // flexGrow: "1"
                 marginBottom: "400px"
 

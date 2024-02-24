@@ -1,5 +1,5 @@
 import { FC, useEffect } from "react"
-import useSyles from "./Styles"
+import useStyles from "./Styles"
 import { Box, Palette, useTheme } from "@mui/material";
 import Konva from "konva";
 import Vector2 from "./Vector2";
@@ -233,7 +233,7 @@ const Main = (palette: Palette) => {
 
 const Machine: FC = () => {
     const palette = useTheme().palette;
-    const styles: any = useSyles().machine;
+    const styles: any = useStyles().machine;
     useEffect(Main(palette), [palette]);
 
     return <Box id="canvas" sx={styles.root}>

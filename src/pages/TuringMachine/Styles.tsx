@@ -9,7 +9,7 @@ type stylesTypeFirst = {
 }
 
 
-const useSyles = (): stylesTypeFirst => {
+const useStyles = (): stylesTypeFirst => {
     const theme = useTheme();
 
     const palette = theme.palette;
@@ -23,12 +23,16 @@ const useSyles = (): stylesTypeFirst => {
                 display: "flex",
                 flexDirection: "column",
             },
-            hud: {
+        },
+
+        // hud
+        hud: {
+            root: {
                 width: "100%",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                padding: "20px",
+                padding: "10px",
                 backgroundColor: palette.primaryContainer.main,
                 color: palette.onPrimaryContainer.main
             },
@@ -44,10 +48,10 @@ const useSyles = (): stylesTypeFirst => {
                 alignItems: "center",
                 marginRight: "40px"
             },
-            hud_left: {
+            left: {
                 // marginLeft: "20px"
-            }, 
-            hud_right: {
+            },
+            right: {
                 display: "flex",
             },
             play_control: {
@@ -61,25 +65,16 @@ const useSyles = (): stylesTypeFirst => {
                 height: "80%",
                 backgroundColor: palette.surfaceContainerLow.main,
                 borderRadius: "30px 30px 0 0",
-                paddingTop: 40
             },
             drawer_opener: {
                 color: palette.onSurface.main,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                height: "80px",
+                height: "50px",
                 fontWeight: "bold",
                 backgroundColor: palette.surfaceContainerLow.main,
-                fontSize: "24px"
-            },
-            table: {
-                overflow: "hidden",
-                borderRadius: "30px"
-            },
-            options: {
-                paddingLeft: "20px",
-                marginBottom: "20px"
+                fontSize: "20px"
             }
         },
 
@@ -89,13 +84,37 @@ const useSyles = (): stylesTypeFirst => {
             root: {
                 height: "600px",
                 width: "2500px",
-                // flexGrow: "1"
                 marginBottom: "400px"
 
+            }
+        },
+
+        // ControlPanel
+        controlPanel: {
+            root: {
+                paddingTop: "30px"
+            },
+            table: {
+                boxShadow: "none",
+                overflow: "scroll",
+                borderRadius: "30px",
+                margin: "0 10px"
+            },
+            input: {
+                width: "30%",
+                display: "flex",
+                justifyContent: "space-around",
+            },
+            input_container: {
+                marginBottom: "30px",
+                marginLeft: "30px"
+            },
+            latex: {
+                marginTop: "10px"
             }
         }
     }
 }
 
 
-export default useSyles;
+export default useStyles;

@@ -1,5 +1,6 @@
-import { Box, SxProps, useMediaQuery, useTheme } from "@mui/material";
+import { Box, SxProps} from "@mui/material";
 import { FC, useState } from "react";
+// @ts-ignore
 import { Outlet } from "react-router-dom";
 import MainDrawer from "../Drawer/MainDrawer";
 import MainAppBar from "../AppBar/MainAppBar";
@@ -9,8 +10,8 @@ const drawerWidth = 260;
 
 const MainLayout: FC = () => {
 
-    const theme = useTheme();
-    const isSmUp = useMediaQuery(theme.breakpoints.up('md'));
+    // const theme = useTheme();
+    // const isSmUp = useMediaQuery(theme.breakpoints.up('md'));
 
     const [mobileOpen, setMobileOpen] = useState(false);
 

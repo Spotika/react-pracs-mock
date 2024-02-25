@@ -65,6 +65,7 @@ const useStyles = (): stylesTypeFirst => {
                 height: "80%",
                 backgroundColor: palette.surfaceContainerLow.main,
                 borderRadius: "30px 30px 0 0",
+                overflowX: "hidden"
             },
             drawer_opener: {
                 color: palette.onSurface.main,
@@ -85,23 +86,27 @@ const useStyles = (): stylesTypeFirst => {
                 height: "600px",
                 width: "2500px",
                 marginBottom: "400px"
-
             }
         },
 
         // ControlPanel
         controlPanel: {
             root: {
-                paddingTop: "30px"
+                paddingTop: "30px",
+                display: "flex",
+                flexDirection: "column",
+                height: "100%"
             },
             table: {
                 boxShadow: "none",
                 overflow: "scroll",
                 borderRadius: "30px",
-                margin: "0 10px"
+                margin: "0 auto",
+                maxWidth: "98%",
             },
             input: {
                 width: "30%",
+                // height: "50%",
                 display: "flex",
                 justifyContent: "space-around",
             },
@@ -111,6 +116,16 @@ const useStyles = (): stylesTypeFirst => {
             },
             latex: {
                 marginTop: "10px"
+            }
+        },
+
+        // configCell
+        configCell: {
+            root: {
+                width: 70,
+                maxWidth: 100,
+                minWidth: 100,
+                borderBottom: 0
             }
         }
     }

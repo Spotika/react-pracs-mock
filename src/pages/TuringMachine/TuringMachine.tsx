@@ -13,7 +13,20 @@ const TuringMachine: FC = () => {
         problemA: [],
         customA: [],
         states: [
-            {id: 0, name: "begin", configurations: [new TuringConfiguration("lambda")]}
+            {id: 0, name: "begin", configurations: [new TuringConfiguration("lambda")]},
+            {id: 1, name: "begin1", configurations: [new TuringConfiguration("lambda")]},
+            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            {id: 3, name: "begin3", configurations: [new TuringConfiguration("lambda")]}
         ]
     });
 

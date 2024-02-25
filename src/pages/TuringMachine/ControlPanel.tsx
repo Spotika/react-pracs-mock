@@ -1,7 +1,6 @@
-import React, {FC, useEffect, useState} from "react";
+import React, {FC, useEffect, useRef, useState} from "react";
 import {
     Box,
-    Button, Input,
     Paper,
     styled,
     Table,
@@ -13,25 +12,42 @@ import {
 } from "@mui/material";
 import useStyles from "./Styles.tsx";
 import Latex from "react-latex-next";
+import ConfigCell, {focusType} from "./ConfigCell.tsx";
+import {useOnClickOutside} from "usehooks-ts";
+import {useHotkeys} from "react-hotkeys-hook";
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+const StyledTableCell = styled(TableCell)(({theme}) => ({
+    "&:first-of-type": {
+        minWidth: "400px",
+    },
+
     [`&.${tableCellClasses.head}`]: {
+        // overflowX: "initial",
         backgroundColor: theme.palette.secondaryContainer.main,
         color: theme.palette.onSecondaryContainer.main,
-        border: theme.palette.outline.main,
+        borderBottom: `3px solid ${theme.palette.outline.main}`,
         fontSize: 20,
+        minWidth: "100px",
+        height: "10px"
     },
     [`&.${tableCellClasses.body}`]: {
-        fontSize: 13
+        fontSize: 13,
+        borderBottom: 0,
+        // maxWidth: "100px",
+        // minWidth: "100px",
     },
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
+const StyledTableRow = styled(TableRow)(({theme}) => ({
     '&:nth-of-type(odd)': {
-        backgroundColor: theme.palette.action.hover,
+        border: 0,
+        backgroundColor: theme.palette.surfaceContainerLowest.main,
     },
+    // "&:nth-child(odd)": {
+    //     display: "none"
+    // },
     // hide last border
-    '&:last-child td, &:last-child th': {
+    '&:last-child tr, &:last-child td': {
         border: 0,
     },
 }));
@@ -90,9 +106,9 @@ const getProblemCustomA = (problemAInput: string, customAInput: string): {
     const customASplit = customAInput.split(" ");
     const result = removeDuplicates(
         problemASplit
-        .concat(
-            customASplit
-        ));
+            .concat(
+                customASplit
+            ));
 
     let problemA: string[] = result.filter(
         elem => problemASplit.includes(elem) && elem != ""
@@ -153,6 +169,12 @@ const ControlPanel: FC<Props> = ({turingOptions, setTuringOptions}) => {
     const [customAInput, setCustomAInput] = useState<string>("");
     const [customAError, setCustomAError] = useState<boolean>(false);
     const [problemAError, setProblemAError] = useState<boolean>(false);
+    const [cellFocus,
+        setCellFocus] = useState<focusType | null>(null);
+
+    const tableRef = useRef(null);
+
+    useOnClickOutside(tableRef, () => setCellFocus(null));
 
     useEffect(() => {
         setProblemAInput(turingOptions.problemA.join(" "));
@@ -167,42 +189,68 @@ const ControlPanel: FC<Props> = ({turingOptions, setTuringOptions}) => {
 
             let maxId = prevState.states.reduce((max, elem) => Math.max(elem.id, max), 0);
             let newStates: StateType[] = [];
-            // for (let i = 0; i <= maxId; ++i) {
-            //     const currentState = prevState.states.filter(elem => elem.id == i)[0];
-            //     let newConfigs: TuringConfiguration[] = [];
-            //     for (let j = 0; j <= prevState.problemA.length; ++i) {
-            //         let currentChar = "";
-            //         if (j < prevState.problemA.length) {
-            //             currentChar = prevState.problemA[j];
-            //         } else {
-            //             currentChar = "lambda";
-            //         }
-            //         if (currentState
-            //                 .configurations
-            //                 .filter(elem => elem.char == currentChar)
-            //                 .length == 0) {
-            //             newConfigs.push(
-            //                 new TuringConfiguration(currentChar, null, null, null, true)
-            //             );
-            //         } else {
-            //             newConfigs.push(
-            //                 currentState
-            //                     .configurations
-            //                     .filter(elem => elem.char == currentChar)
-            //                     [0]
-            //             )
-            //         }
-            //     }
-            // }
 
+            for (let i = 0; i <= maxId; ++i) {
+                const currentState = prevState.states.filter(elem => elem.id == i)[0];
+                let newConfigs: TuringConfiguration[] = [];
+                for (let j = 0; j <= prevState.problemA.length; ++j) {
+                    let currentChar = "";
+                    if (j < prevState.problemA.length) {
+                        currentChar = prevState.problemA[j];
+                    } else {
+                        currentChar = "lambda";
+                    }
+                    if (currentState
+                        .configurations
+                        .filter(elem => elem.char == currentChar)
+                        .length == 0) {
+                        newConfigs.push(
+                            new TuringConfiguration(currentChar, null, null, null, true)
+                        );
+                    } else {
+                        newConfigs.push(
+                            currentState
+                                .configurations
+                                .filter(elem => elem.char == currentChar)
+                                [0]
+                        );
+                    }
+                }
+
+                for (let j = 0; j < prevState.customA.length; ++j) {
+                    const currentChar = prevState.customA[j];
+
+                    if (currentState
+                        .configurations
+                        .filter(elem => elem.char == currentChar)
+                        .length == 0) {
+                        newConfigs.push(
+                            new TuringConfiguration(currentChar, null, null, null, true)
+                        );
+                    } else {
+                        newConfigs.push(
+                            currentState
+                                .configurations
+                                .filter(elem => elem.char == currentChar)
+                                [0]
+                        );
+                    }
+                }
+
+                currentState.configurations = newConfigs;
+                newStates.push(currentState);
+            }
+            prevState.states = newStates;
 
             return {...prevState};
         });
-
-
-
-
     }, [problemAInput, customAInput]);
+
+    // hotkeys
+    useHotkeys("right", () => {
+        console.log(123);
+    })
+
 
     const handleChangeA = (
         setter: React.Dispatch<React.SetStateAction<string>>,
@@ -241,50 +289,75 @@ const ControlPanel: FC<Props> = ({turingOptions, setTuringOptions}) => {
             </Box>
             <Box sx={styles.latex}>
                 <Latex>
-                    {"$A=\\{"+getLatexSetRepresentation(turingOptions.problemA)+"\\}$"}
+                    {"$A=\\{" + getLatexSetRepresentation(turingOptions.problemA) + "\\}$"}
                 </Latex>
                 <br/>
                 <Latex>
-                    {"$B=\\{"+getLatexSetRepresentation(turingOptions.customA)+"\\}$"}
+                    {"$B=\\{" + getLatexSetRepresentation(turingOptions.customA) + "\\}$"}
                 </Latex>
             </Box>
         </Box>
         {/* Table */}
-        <Box sx={styles.table}>
-            <TableContainer component={Paper} sx={{overflow: "scroll"}}>
-                <Table sx={{ minWidth: 700 }} aria-label="Input table">
+        <Box sx={{flexGrow: 1}}>
+            <TableContainer
+                component={Paper}
+                sx={styles.table}
+                ref={tableRef}
+            >
+                <Table
+                    aria-label="Input table"
+                    stickyHeader
+                >
                     <TableHead>
                         <TableRow>
                             <StyledTableCell>State \ Character</StyledTableCell>
                             {getLatexSetRepresentation(turingOptions.problemA).map((elem) => (
-                                <StyledTableCell key={elem}>
+                                <StyledTableCell key={elem} align="right">
                                     <Latex>
-                                        {"$"+elem+"$"}
+                                        {"$" + elem + "$"}
                                     </Latex>
                                 </StyledTableCell>
                             ))}
-                            <StyledTableCell>
+                            <StyledTableCell align="right">
                                 <Latex>
                                     {"$\\pmb{\\lambda}$"}
                                 </Latex>
                             </StyledTableCell>
                             {getLatexSetRepresentation(turingOptions.customA).map((elem) => (
-                                <StyledTableCell key={elem}>
+                                <StyledTableCell key={elem} align="right">
                                     <Latex>
-                                        {"$"+elem+"$"}
+                                        {"$" + elem + "$"}
                                     </Latex>
                                 </StyledTableCell>
                             ))}
                         </TableRow>
                     </TableHead>
                     <TableBody>
+                        {turingOptions.states.map((state) => (
+                            <StyledTableRow key={state.name}>
+                                <StyledTableCell>
+                                    {state.name}
+                                </StyledTableCell>
+                                {state.configurations.map((configuration) => (
+                                    <ConfigCell
+                                        stateName={state.name}
+                                        focus={cellFocus}
+                                        configuration={configuration}
+                                        key={configuration.char}
+                                        onClick={() => setCellFocus({
+                                            char: configuration.char,
+                                            name: state.name
+                                        })}
+                                    />
+                                ))}
+                            </StyledTableRow>
+                        ))}
                     </TableBody>
                 </Table>
             </TableContainer>
         </Box>
     </Box>
 }
-
 
 
 export default ControlPanel;

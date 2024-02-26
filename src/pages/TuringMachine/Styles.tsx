@@ -102,7 +102,7 @@ const useStyles = (): stylesTypeFirst => {
                 overflow: "scroll",
                 borderRadius: "30px",
                 margin: "0 auto",
-                maxWidth: "98%",
+                maxWidth: "90%",
             },
             input: {
                 width: "30%",
@@ -123,9 +123,16 @@ const useStyles = (): stylesTypeFirst => {
         configCell: {
             root: {
                 width: 70,
-                maxWidth: 100,
-                minWidth: 100,
-                borderBottom: 0
+                // maxWidth: 100,
+                minWidth: 150,
+                borderBottom: 0,
+                overflow: "visible"
+            },
+            input_container: {
+                display: "flex",
+            },
+            text_field: {
+                width: "100px",
             }
         }
     }

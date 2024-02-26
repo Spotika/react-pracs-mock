@@ -1,4 +1,4 @@
-import React, {FC, useState} from "react";
+import React, {FC, SetStateAction } from "react";
 import useStyles from "./Styles.tsx";
 import {Box, Drawer} from "@mui/material";
 import SettingsInputComponentRoundedIcon from "@mui/icons-material/SettingsInputComponentRounded";
@@ -6,11 +6,12 @@ import SettingsInputComponentRoundedIcon from "@mui/icons-material/SettingsInput
 
 type Props = {
     children?: React.ReactNode
+    drawerOpen: boolean,
+    setDrawerOpen: React.Dispatch<SetStateAction<boolean>>
 };
-const TDrawer: FC<Props> = ({children}) => {
+const TDrawer: FC<Props> = ({children, drawerOpen, setDrawerOpen}) => {
 
     const styles: any = useStyles().drawer;
-    const [drawerOpen, setDrawerOpen] = useState(true);
 
     const handleDrawerToggle = () => {
         setDrawerOpen(!drawerOpen);

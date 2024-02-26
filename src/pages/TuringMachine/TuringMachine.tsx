@@ -9,6 +9,7 @@ import Hud from "./Hud.tsx";
 const TuringMachine: FC = () => {
 
     const styles: any = useStyles().main;
+    const [drawerOpen, setDrawerOpen] = useState(true);
     const [turingOptions, setTuringOptions] = useState<TuringOptionsType>({
         problemA: [],
         customA: [],
@@ -16,22 +17,22 @@ const TuringMachine: FC = () => {
             {id: 0, name: "begin", configurations: [new TuringConfiguration("lambda")]},
             {id: 1, name: "begin1", configurations: [new TuringConfiguration("lambda")]},
             {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
-            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
-            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
-            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
-            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
-            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
-            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
-            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
-            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
-            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
-            {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            // {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            // {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            // {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            // {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            // {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            // {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            // {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            // {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            // {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
+            // {id: 2, name: "begin2", configurations: [new TuringConfiguration("lambda")]},
             {id: 3, name: "begin3", configurations: [new TuringConfiguration("lambda")]}
         ]
     });
 
     useEffect(() => {
-
+        console.log(turingOptions);
     }, [turingOptions]);
 
     return <Box sx={styles.root}>
@@ -47,8 +48,8 @@ const TuringMachine: FC = () => {
                 {/*<Machine/>*/}
             </Box>
         </Box>
-        <TDrawer>
-            <ControlPanel turingOptions={turingOptions} setTuringOptions={setTuringOptions}/>
+        <TDrawer drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen}>
+            <ControlPanel isDrawerOpen={drawerOpen} turingOptions={turingOptions} setTuringOptions={setTuringOptions}/>
         </TDrawer>
     </Box>
 }

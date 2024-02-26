@@ -13,8 +13,9 @@ import {
 import useStyles from "./Styles.tsx";
 import Latex from "react-latex-next";
 import ConfigCell, {focusType} from "./ConfigCell.tsx";
-import {useOnClickOutside} from "usehooks-ts";
 import {useHotkeys} from "react-hotkeys-hook";
+import StateCell from "./StateCell.tsx";
+
 
 const StyledTableCell = styled(TableCell)(({theme}) => ({
     "&:first-of-type": {
@@ -123,7 +124,7 @@ const getProblemCustomA = (problemAInput: string, customAInput: string): {
     }
 }
 
-const getLatexSetRepresentation = (set: string[]): string[] => {
+export const getLatexSetRepresentation = (set: string[]): string[] => {
 
     const specialChars = "#$%&{}^"
 
@@ -158,31 +159,44 @@ export type TuringOptionsType = {
 
 type Props = {
     turingOptions: TuringOptionsType,
-    setTuringOptions: React.Dispatch<React.SetStateAction<TuringOptionsType>>
+    setTuringOptions: React.Dispatch<React.SetStateAction<TuringOptionsType>>,
+    isDrawerOpen: boolean
 }
 
 
-const ControlPanel: FC<Props> = ({turingOptions, setTuringOptions}) => {
+const ControlPanel: FC<Props> = ({
+                                     turingOptions,
+                                     setTuringOptions,
+                                     isDrawerOpen
+                                 }) => {
 
+    const [localTuringOptions, setLocalTuringOptions] = useState(turingOptions);
     const styles = useStyles().controlPanel;
-    const [problemAInput, setProblemAInput] = useState<string>("");
-    const [customAInput, setCustomAInput] = useState<string>("");
+    const [problemAInput, setProblemAInput] = useState<string>(
+        localTuringOptions.problemA.join(" ")
+    );
+    const [customAInput, setCustomAInput] = useState<string>(
+        (localTuringOptions.customA.join(" "))
+    );
     const [customAError, setCustomAError] = useState<boolean>(false);
     const [problemAError, setProblemAError] = useState<boolean>(false);
     const [cellFocus,
         setCellFocus] = useState<focusType | null>(null);
 
-    const tableRef = useRef(null);
-
-    useOnClickOutside(tableRef, () => setCellFocus(null));
-
-    useEffect(() => {
-        setProblemAInput(turingOptions.problemA.join(" "));
-        setCustomAInput(turingOptions.customA.join(" "));
-    }, []);
+    const rootRef = useRef(null);
+    const [banana, setBanana] = useState(false);
 
     useEffect(() => {
-        setTuringOptions((prevState: TuringOptionsType) => {
+        setCellFocus(null);
+        if (!banana) {
+            setBanana(true);
+        } else {
+            setTuringOptions(localTuringOptions);
+        }
+    }, [isDrawerOpen]);
+
+    useEffect(() => {
+        setLocalTuringOptions((prevState: TuringOptionsType) => {
             const problemCustomA = getProblemCustomA(problemAInput, customAInput);
             prevState.problemA = problemCustomA.problemA;
             prevState.customA = problemCustomA.customA;
@@ -246,9 +260,11 @@ const ControlPanel: FC<Props> = ({turingOptions, setTuringOptions}) => {
         });
     }, [problemAInput, customAInput]);
 
+
     // hotkeys
-    useHotkeys("right", () => {
-        console.log(123);
+    useHotkeys("enter", () => {
+        // if (cellFocus === null) return;
+        setCellFocus(null);
     })
 
 
@@ -268,11 +284,12 @@ const ControlPanel: FC<Props> = ({turingOptions, setTuringOptions}) => {
         }
 
 
-    return <Box sx={styles.root}>
+    return <Box ref={rootRef} sx={styles.root}>
         {/* Input */}
-        <Box sx={styles.input_container}>
+        <Box sx={styles.input_container} onClick={() => setCellFocus(null)}>
             <Box sx={styles.input}>
                 <TextField
+                    onFocus={() => setCellFocus(null)}
                     variant="outlined"
                     label={"Problem alphabet"}
                     value={problemAInput}
@@ -280,6 +297,7 @@ const ControlPanel: FC<Props> = ({turingOptions, setTuringOptions}) => {
                     error={problemAError}
                 />
                 <TextField
+                    onFocus={() => setCellFocus(null)}
                     variant="outlined"
                     label={"Custom alphabet"}
                     value={customAInput}
@@ -289,11 +307,11 @@ const ControlPanel: FC<Props> = ({turingOptions, setTuringOptions}) => {
             </Box>
             <Box sx={styles.latex}>
                 <Latex>
-                    {"$A=\\{" + getLatexSetRepresentation(turingOptions.problemA) + "\\}$"}
+                    {"$A=\\{" + getLatexSetRepresentation(localTuringOptions.problemA) + "\\}$"}
                 </Latex>
                 <br/>
                 <Latex>
-                    {"$B=\\{" + getLatexSetRepresentation(turingOptions.customA) + "\\}$"}
+                    {"$B=\\{" + getLatexSetRepresentation(localTuringOptions.customA) + "\\}$"}
                 </Latex>
             </Box>
         </Box>
@@ -302,16 +320,15 @@ const ControlPanel: FC<Props> = ({turingOptions, setTuringOptions}) => {
             <TableContainer
                 component={Paper}
                 sx={styles.table}
-                ref={tableRef}
             >
                 <Table
                     aria-label="Input table"
                     stickyHeader
                 >
                     <TableHead>
-                        <TableRow>
+                        <TableRow onClick={() => setCellFocus(null)}>
                             <StyledTableCell>State \ Character</StyledTableCell>
-                            {getLatexSetRepresentation(turingOptions.problemA).map((elem) => (
+                            {getLatexSetRepresentation(localTuringOptions.problemA).map((elem) => (
                                 <StyledTableCell key={elem} align="right">
                                     <Latex>
                                         {"$" + elem + "$"}
@@ -323,7 +340,7 @@ const ControlPanel: FC<Props> = ({turingOptions, setTuringOptions}) => {
                                     {"$\\pmb{\\lambda}$"}
                                 </Latex>
                             </StyledTableCell>
-                            {getLatexSetRepresentation(turingOptions.customA).map((elem) => (
+                            {getLatexSetRepresentation(localTuringOptions.customA).map((elem) => (
                                 <StyledTableCell key={elem} align="right">
                                     <Latex>
                                         {"$" + elem + "$"}
@@ -333,20 +350,77 @@ const ControlPanel: FC<Props> = ({turingOptions, setTuringOptions}) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {turingOptions.states.map((state) => (
+                        {localTuringOptions.states.map((state) => (
                             <StyledTableRow key={state.name}>
-                                <StyledTableCell>
-                                    {state.name}
-                                </StyledTableCell>
+                                <StateCell
+                                    stateName={state.name}
+                                    focus={cellFocus}
+                                    onClick={() => {
+                                        setCellFocus({
+                                            char: "",
+                                            name: state.name,
+                                            isState: true
+                                        })
+                                    }}
+                                    validateState={(value) => {
+                                        if (value.includes(" ") || value.length > 40) return false
+
+                                        const states = localTuringOptions.states
+                                            .map(e => e.name)
+                                            .filter(e => e != state.name);
+
+                                        if (states.includes(value)) return undefined;
+
+                                        return true;
+                                    }}
+
+                                    setStateName={(state_from, state_to) => {
+                                        setLocalTuringOptions((prevState) => {
+                                            prevState.states = prevState.states.map((st) => {
+                                                if (st.name == state_from) {
+                                                    st.name = state_to;
+                                                }
+                                                return st;
+                                            });
+                                            return {
+                                                ...prevState
+                                            }
+                                        })
+                                    }}
+                                />
                                 {state.configurations.map((configuration) => (
                                     <ConfigCell
+                                        options={{
+                                            states: localTuringOptions.states.map(e => e.name).concat(["!"]),
+                                            alphabets: ["lambda"].concat(localTuringOptions.problemA.concat(
+                                                localTuringOptions.customA
+                                            ))
+                                        }}
+                                        setConfiguration={(value: TuringConfiguration) => {
+                                            setLocalTuringOptions((prevState: TuringOptionsType) => {
+                                                prevState.states = prevState.states.map((st) => {
+                                                    if (st.name != state.name) return st;
+                                                    st.configurations = st.configurations.map(
+                                                        (conf: TuringConfiguration) => {
+                                                            if (conf.char != value.char) return conf;
+                                                            return value;
+                                                        });
+                                                    return st;
+                                                });
+
+                                                return {
+                                                    ...prevState
+                                                };
+                                            });
+                                        }}
                                         stateName={state.name}
                                         focus={cellFocus}
                                         configuration={configuration}
                                         key={configuration.char}
                                         onClick={() => setCellFocus({
                                             char: configuration.char,
-                                            name: state.name
+                                            name: state.name,
+                                            isState: false
                                         })}
                                     />
                                 ))}

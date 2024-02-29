@@ -5,10 +5,20 @@ import PauseRoundedIcon from "@mui/icons-material/PauseRounded";
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import SkipNextRoundedIcon from "@mui/icons-material/SkipNextRounded";
 import useStyles from "./Styles.tsx";
-import {useState} from "react";
+import React, {FC, SetStateAction, useState} from "react";
 
 
-const Hud = () => {
+type Props = {
+    duration: number,
+    setDuration: React.Dispatch<SetStateAction<number>>,
+    currentStateName: string
+}
+
+const Hud: FC<Props> = ({
+    duration,
+    setDuration,
+    currentStateName
+                        }) => {
 
     const styles = useStyles().hud;
     const [action, setAction] = useState(false);
@@ -17,10 +27,16 @@ const Hud = () => {
         setAction(!action);
     }
 
+    const handleChange = (_event: Event, value: number | number[]) => {
+        if (Array.isArray(value)) return;
+
+        setDuration(value);
+    }
+
     return <Box sx={styles.root}>
         <Box sx={styles.left}>
             <Typography fontWeight="bold" variant="h6">
-                Current state:
+                Current state: {currentStateName}
             </Typography>
         </Box>
         <Box sx={styles.right}>
@@ -33,8 +49,8 @@ const Hud = () => {
                     step={0.1}
                     aria-label="Small"
                     size="small"
-                    // value={duration}
-                    // onChange={handleChange}
+                    value={duration}
+                    onChange={handleChange}
                     valueLabelDisplay="auto"/>
             </Box>
             <Box sx={styles.play_control}>

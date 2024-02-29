@@ -4,7 +4,7 @@ type StylesTypeSecond = {
     [Key: string]: SxProps
 }
 
-type stylesTypeFirst = {
+export type stylesTypeFirst = {
     [Key: string]: StylesTypeSecond
 }
 
@@ -83,9 +83,9 @@ const useStyles = (): stylesTypeFirst => {
         // machine
         machine: {
             root: {
-                height: "600px",
-                width: "2500px",
-                marginBottom: "400px"
+                // height: "100%"
+                flexGrow: 1,
+                width: "100%"
             }
         },
 
@@ -106,16 +106,26 @@ const useStyles = (): stylesTypeFirst => {
             },
             input: {
                 width: "30%",
-                // height: "50%",
                 display: "flex",
                 justifyContent: "space-around",
             },
             input_container: {
-                marginBottom: "30px",
-                marginLeft: "30px"
+                marginBottom: "50px",
+                marginLeft: "30px",
+                display: "flex"
             },
             latex: {
                 marginTop: "10px"
+            },
+            latex_input: {
+                display: "flex",
+                flexDirection: "column",
+                flexGrow: 1
+            },
+            buttons: {
+                display: "flex",
+                flexDirection: "column",
+                paddingRight: "30px"
             }
         },
 

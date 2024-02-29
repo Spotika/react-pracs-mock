@@ -1,6 +1,6 @@
 import React, {FC, useEffect, useRef, useState} from "react";
 import {
-    Box,
+    Box, Button,
     Paper,
     styled,
     Table,
@@ -15,6 +15,7 @@ import Latex from "react-latex-next";
 import ConfigCell, {focusType} from "./ConfigCell.tsx";
 import {useHotkeys} from "react-hotkeys-hook";
 import StateCell from "./StateCell.tsx";
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
 
 
 const StyledTableCell = styled(TableCell)(({theme}) => ({
@@ -263,10 +264,8 @@ const ControlPanel: FC<Props> = ({
 
     // hotkeys
     useHotkeys("enter", () => {
-        // if (cellFocus === null) return;
         setCellFocus(null);
     })
-
 
     const handleChangeA = (
         setter: React.Dispatch<React.SetStateAction<string>>,
@@ -283,36 +282,95 @@ const ControlPanel: FC<Props> = ({
             setter(newValue);
         }
 
+    const deleteState = (stateName: string) => {
+        setCellFocus(null);
+        setLocalTuringOptions((prevState) => {
+
+            prevState.states = prevState.states.filter(e => e.name != stateName);
+
+            return {
+                ...prevState
+            }
+        })
+    }
+
+    const addState = () => {
+        const names = localTuringOptions.states.map(e => e.name);
+
+        let i = 1;
+        while (names.includes(`Untitled${i}`)) {
+            ++i;
+        }
+
+        const newName = `Untitled${i}`;
+        const newId = Math.max(...localTuringOptions.states.map(e => e.id)) + 1;
+
+        setLocalTuringOptions((prevState) => {
+
+            prevState.states.push({
+                name: newName,
+                id: newId,
+                configurations: prevState.problemA
+                    .concat(["lambda"])
+                    .concat(prevState.customA).map((char) => {
+                        return {
+                            char: char,
+                            first: null,
+                            second: null,
+                            third: null,
+                            cross: true,
+                        }
+                    })
+            })
+
+            setCellFocus({
+                isState: true,
+                name: newName,
+                char: ""
+            })
+
+            return {
+                ...prevState
+            }
+        });
+    }
 
     return <Box ref={rootRef} sx={styles.root}>
         {/* Input */}
-        <Box sx={styles.input_container} onClick={() => setCellFocus(null)}>
-            <Box sx={styles.input}>
-                <TextField
-                    onFocus={() => setCellFocus(null)}
-                    variant="outlined"
-                    label={"Problem alphabet"}
-                    value={problemAInput}
-                    onChange={handleChangeA(setProblemAInput, setProblemAError)}
-                    error={problemAError}
-                />
-                <TextField
-                    onFocus={() => setCellFocus(null)}
-                    variant="outlined"
-                    label={"Custom alphabet"}
-                    value={customAInput}
-                    onChange={handleChangeA(setCustomAInput, setCustomAError)}
-                    error={customAError}
-                />
+        <Box sx={styles.input_container}>
+            <Box sx={styles.latex_input}>
+                <Box sx={styles.input}>
+                    <TextField
+                        onFocus={() => setCellFocus(null)}
+                        variant="outlined"
+                        label={"Problem alphabet"}
+                        value={problemAInput}
+                        onChange={handleChangeA(setProblemAInput, setProblemAError)}
+                        error={problemAError}
+                    />
+                    <TextField
+                        onFocus={() => setCellFocus(null)}
+                        variant="outlined"
+                        label={"Custom alphabet"}
+                        value={customAInput}
+                        onChange={handleChangeA(setCustomAInput, setCustomAError)}
+                        error={customAError}
+                    />
+                </Box>
+                <Box sx={styles.latex}>
+                    <Latex>
+                        {"$A=\\{" + getLatexSetRepresentation(localTuringOptions.problemA) + "\\}$"}
+                    </Latex>
+                    <br/>
+                    <Latex>
+                        {"$B=\\{" + getLatexSetRepresentation(localTuringOptions.customA) + "\\}$"}
+                    </Latex>
+                </Box>
             </Box>
-            <Box sx={styles.latex}>
-                <Latex>
-                    {"$A=\\{" + getLatexSetRepresentation(localTuringOptions.problemA) + "\\}$"}
-                </Latex>
-                <br/>
-                <Latex>
-                    {"$B=\\{" + getLatexSetRepresentation(localTuringOptions.customA) + "\\}$"}
-                </Latex>
+            <Box sx={styles.buttons}>
+                <Button variant={"filled"} startIcon={<AddRoundedIcon/>} onClick={addState}>
+                    Add state
+                </Button>
             </Box>
         </Box>
         {/* Table */}
@@ -353,6 +411,8 @@ const ControlPanel: FC<Props> = ({
                         {localTuringOptions.states.map((state) => (
                             <StyledTableRow key={state.name}>
                                 <StateCell
+                                    stateId={state.id}
+                                    deleteState={deleteState}
                                     stateName={state.name}
                                     focus={cellFocus}
                                     onClick={() => {
@@ -380,11 +440,22 @@ const ControlPanel: FC<Props> = ({
                                                 if (st.name == state_from) {
                                                     st.name = state_to;
                                                 }
+
+                                                st.configurations = st.configurations.map((conf) => {
+                                                    if (conf.third == state_from) {
+                                                        conf.third = state_to;
+                                                    }
+                                                    return conf;
+                                                });
+
                                                 return st;
                                             });
                                             return {
                                                 ...prevState
                                             }
+
+
+
                                         })
                                     }}
                                 />

@@ -1,6 +1,7 @@
-import {Input, styled, TableCell, tableCellClasses, Typography} from "@mui/material";
+import {Box, IconButton, Input, styled, TableCell, tableCellClasses, Typography} from "@mui/material";
 import React, {FC, useEffect, useState} from "react";
 import {focusType} from "./ConfigCell.tsx";
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 
 const StyledTableCell = styled(TableCell)(({theme}) => ({
     "&:first-of-type": {
@@ -26,10 +27,12 @@ const StyledTableCell = styled(TableCell)(({theme}) => ({
 
 type Props = {
     stateName: string,
+    stateId: number,
     focus: focusType | null,
     onClick: React.MouseEventHandler<HTMLTableCellElement>,
     setStateName: (from_state: string, to_state: string) => void
     validateState: (state: string) => boolean | undefined
+    deleteState: (stateName: string) => void
 }
 
 const StateCell: FC<Props> = ({
@@ -37,7 +40,9 @@ const StateCell: FC<Props> = ({
                                   focus,
                                   onClick,
                                   validateState,
-                                  setStateName
+                                  setStateName,
+                                  stateId,
+                                  deleteState
                               }) => {
 
     const [prevFocus, setPrevFocus] = useState<boolean | null>(null);
@@ -58,10 +63,6 @@ const StateCell: FC<Props> = ({
         setValue(stateName);
     }, [isFocused]);
 
-    // useEffect(() => {
-    //     setValue(stateName);
-    // }, [stateName]);
-
     const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
 
@@ -77,15 +78,22 @@ const StateCell: FC<Props> = ({
     return <StyledTableCell onClick={onClick}>
         {isFocused ?
             (
-                <Input
-                    value={value}
-                    size={"small"}
-                    sx={{height: "24px"}}
-                    onChange={handleValueChange}
-                    autoFocus={true}
-                    error={error}
-                    fullWidth={true}
-                />
+                <Box sx={{display: "flex", alignItems: "center"}}>
+                    <IconButton onClick={
+                        () => deleteState(stateName)
+                    } disabled={stateId==0} color={"primary"} sx={{marginRight: "10px"}}>
+                        <DeleteRoundedIcon />
+                    </IconButton>
+                    <Input
+                        value={value}
+                        size={"small"}
+                        sx={{height: "24px"}}
+                        onChange={handleValueChange}
+                        autoFocus={true}
+                        error={error}
+                        fullWidth={true}
+                    />
+                </Box>
             )
             :
             (

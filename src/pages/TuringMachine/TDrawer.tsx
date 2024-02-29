@@ -10,7 +10,6 @@ type Props = {
     setDrawerOpen: React.Dispatch<SetStateAction<boolean>>
 };
 const TDrawer: FC<Props> = ({children, drawerOpen, setDrawerOpen}) => {
-
     const styles: any = useStyles().drawer;
 
     const handleDrawerToggle = () => {
